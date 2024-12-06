@@ -60,36 +60,37 @@ async function fetchRapidAPIData(
     testing = "success";
   }
 
-  const url: string =
-    "https://linguatools-english-collocations.p.rapidapi.com/bolls/v2";
+  const requestOptions: RequestInit = {
+    method: "GET",
+    headers: {
+      "x-rapidapi-key": apiKey,
+      "x-rapidapi-host": "linguatools-english-collocations.p.rapidapi.com",
+    },
+  };
 
-  return testing;
+  const url: URL = new URL(
+    "https://linguatools-english-collocations.p.rapidapi.com/bolls/v2"
+  );
 
-  //   try {
-  //     const response: AxiosResponse<any> = await axios.get(url, {
-  //       params: {
-  //         lang: "en",
-  //         query: "light", // Change this to test other queries
-  //         max_results: "2",
-  //         relation: "N:nn:N",
-  //         min_sig: "10000",
-  //       },
-  //       headers: {
-  //         "x-rapidapi-key": apiKey,
-  //         "x-rapidapi-host": "linguatools-english-collocations.p.rapidapi.com",
-  //       },
-  //     });
+  const params = {
+    lang: "en",
+    query: "light", // Change this to test other queries
+    max_results: "2",
+    relation: "N:nn:N",
+    min_sig: "10000",
+  };
 
-  //     console.log("Fetched Data:", response);
-  //     return null;
-  //   } catch (error) {
-  //     if (axios.isAxiosError(error)) {
-  //       console.error("Axios error:", error.message);
-  //     } else {
-  //       console.error("Unexpected error:", error);
-  //     }
-  //     return null;
-  //   }
+  url.search = new URLSearchParams(params).toString();
+
+  try {
+    const response = await fetch(url.toString(), requestOptions);
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    return null;
+  }
 }
 
 // Add a post type definition
@@ -101,8 +102,9 @@ Devvit.addCustomPostType({
     const [answer, setAnswer] = useState<any>(null);
 
     async function onPress() {
-      const response = await fetchRapidAPIData(_context);
-      setAnswer(response);
+      console.log("onPress");
+      //   const response = await fetchRapidAPIData(_context);
+      //   setAnswer(response);
     }
 
     return (
