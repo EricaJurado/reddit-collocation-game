@@ -9,7 +9,7 @@ export const PokemonPage = () => {
   const pokemon = useDevvitListener('GET_POKEMON_RESPONSE');
 
   return (
-    <div className="flex h-full flex-col items-center justify-center">
+    <div>
       <CustomInput
         onChange={(e) => setValue(e.target.value)}
         onSubmit={() => {
@@ -20,11 +20,7 @@ export const PokemonPage = () => {
           });
         }}
       />
-      {loading && !pokemon ? (
-        <div className="text-center text-white">Loading...</div>
-      ) : (
-        <p className="text-white">Pokemon Number: {pokemon?.number}</p>
-      )}
+      {loading && !pokemon ? <div>Loading...</div> : <p>Pokemon Number: {pokemon?.number}</p>}
     </div>
   );
 };
