@@ -1,4 +1,4 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useAsync, useState } from '@devvit/public-api';
 import { DEVVIT_SETTINGS_KEYS } from './constants.js';
 import { sendMessageToWebview } from './utils/utils.js';
 import { WebviewToBlockMessage } from '../game/shared.js';
@@ -61,12 +61,29 @@ Devvit.addCustomPostType({
 
             switch (data.type) {
               case 'INIT':
-                sendMessageToWebview(context, {
-                  type: 'INIT_RESPONSE',
-                  payload: {
-                    postId: context.postId!,
-                  },
-                });
+                try {
+                  // Fetch Reddit post data by postId
+                  const postResponse = await context.reddit.getPostById(context.postId!);
+
+                  const createdAt = postResponse?.createdAt ?? '';
+
+                  sendMessageToWebview(context, {
+                    type: 'INIT_RESPONSE',
+                    payload: {
+                      postId: context.postId!,
+                      createdAt: createdAt.toString(),
+                    },
+                  });
+                } catch (error) {
+                  console.error('Failed to fetch Reddit post details:', error);
+                  sendMessageToWebview(context, {
+                    type: 'INIT_RESPONSE',
+                    payload: {
+                      postId: context.postId!,
+                      createdAt: '', // Graceful fallback
+                    },
+                  });
+                }
                 break;
               case 'GET_POKEMON_REQUEST':
                 context.ui.showToast({ text: `Received message: ${JSON.stringify(data)}` });

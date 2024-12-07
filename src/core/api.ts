@@ -55,7 +55,6 @@ export async function fetchRapidAPIData(
   try {
     const response = await fetch(url.toString(), requestOptions);
     const data = await response.json();
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Error:", error);

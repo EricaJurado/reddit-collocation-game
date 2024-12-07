@@ -1,24 +1,39 @@
 import { Page } from './shared';
-import { PokemonPage } from './pages/PokemonPage';
 import { usePage } from './hooks/usePage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { sendToDevvit } from './utils';
+import { GuessPage } from './pages/GuessPage';
+import { useDevvitListener } from './hooks/useDevvitListener';
 
-const getPage = (page: Page) => {
+const getPage = (
+  page: Page,
+  { postId }: { postId: string },
+  { createdAt }: { createdAt: string }
+) => {
   switch (page) {
     case 'home':
-      return <PokemonPage />;
+      return <GuessPage postId={postId} createdAt={createdAt} />;
     default:
       throw new Error(`Unknown page: ${page satisfies never}`);
   }
 };
 
 export const App = () => {
+  const [postId, setPostId] = useState('');
+  const [createdAt, setcreatedAt] = useState('');
   const page = usePage();
+  const initData = useDevvitListener('INIT_RESPONSE');
 
   useEffect(() => {
     sendToDevvit({ type: 'INIT' });
   }, []);
 
-  return <div className="h-full">{getPage(page)}</div>;
+  useEffect(() => {
+    if (initData) {
+      setPostId(initData.postId);
+      setcreatedAt(initData.createdAt);
+    }
+  }, [initData, setPostId, setcreatedAt]);
+
+  return <div className="h-full">{getPage(page, { postId }, { createdAt })}</div>;
 };

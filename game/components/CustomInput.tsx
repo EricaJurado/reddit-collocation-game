@@ -12,7 +12,6 @@ export function CustomInput({
 
   const handleSubmit = () => {
     onSubmit && onSubmit();
-    setValue('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
