@@ -1,127 +1,92 @@
-// Learn more at developers.reddit.com/docs
-import { Devvit, useState } from "@devvit/public-api";
-import axios, { AxiosResponse } from "axios";
+import { Devvit } from '@devvit/public-api';
+import { DEVVIT_SETTINGS_KEYS } from './constants.js';
+import { sendMessageToWebview } from './utils/utils.js';
+import { WebviewToBlockMessage } from '../game/shared.js';
+import { WEBVIEW_ID } from './constants.js';
+import { Preview } from './components/Preview.js';
+import { getPokemonByName } from './core/pokeapi.js';
+
+Devvit.addSettings([
+  // Just here as an example
+  {
+    name: DEVVIT_SETTINGS_KEYS.SECRET_API_KEY,
+    label: 'API Key for secret things',
+    type: 'string',
+    isSecret: true,
+    scope: 'app',
+  },
+]);
 
 Devvit.configure({
   redditAPI: true,
   http: true,
+  redis: true,
+  realtime: true,
 });
 
-Devvit.addSettings([
-  {
-    name: "rapidapikey",
-    label: "RapidAPI Key",
-    type: "string",
-    isSecret: true,
-    scope: "app",
-  },
-]);
-
-// Add a menu item to the subreddit menu for instantiating the new experience post
 Devvit.addMenuItem({
-  label: "Add my post",
-  location: "subreddit",
-  forUserType: "moderator",
+  // Please update as you work on your idea!
+  label: 'Make my experience post',
+  location: 'subreddit',
+  forUserType: 'moderator',
   onPress: async (_event, context) => {
     const { reddit, ui } = context;
     const subreddit = await reddit.getCurrentSubreddit();
-    await reddit.submitPost({
-      title: "My devvit post",
+    const post = await reddit.submitPost({
+      // Title of the post. You'll want to update!
+      title: 'My first experience post',
       subredditName: subreddit.name,
-      // The preview appears while the post loads
-      preview: (
-        <vstack height="100%" width="100%" alignment="middle center">
-          <text size="large">Loading ...</text>
-        </vstack>
-      ),
+      preview: <Preview />,
     });
-    ui.showToast({ text: "Created post!" });
+    ui.showToast({ text: 'Created post!' });
+    ui.navigateTo(post.url);
   },
 });
 
-interface CollocationResponse {
-  bolls: Array<{
-    base: string;
-    collocation: string;
-    score: number;
-  }>;
-}
-
-async function fetchRapidAPIData(
-  context: Devvit.Context
-): Promise<CollocationResponse | null | string> {
-  const apiKey = await context.settings.get("rapidapikey");
-  let testing = "testing";
-  if (typeof apiKey !== "string" || !apiKey) {
-    testing = "uh-oh";
-    throw new Error("RapidAPI key is missing or invalid in settings.");
-  } else {
-    console.log("Success apikey");
-    testing = "success";
-  }
-
-  const requestOptions: RequestInit = {
-    method: "GET",
-    headers: {
-      "x-rapidapi-key": apiKey,
-      "x-rapidapi-host": "linguatools-english-collocations.p.rapidapi.com",
-    },
-  };
-
-  const url: URL = new URL(
-    "https://linguatools-english-collocations.p.rapidapi.com/bolls/v2"
-  );
-
-  const params = {
-    lang: "en",
-    query: "light", // Change this to test other queries
-    max_results: "2",
-    relation: "N:nn:N",
-    min_sig: "10000",
-  };
-
-  url.search = new URLSearchParams(params).toString();
-
-  try {
-    const response = await fetch(url.toString(), requestOptions);
-    const data = await response.json();
-    console.log(data);
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    return null;
-  }
-}
-
 // Add a post type definition
 Devvit.addCustomPostType({
-  name: "Experience Post",
-  height: "regular",
-  render: (_context) => {
-    const [counter, setCounter] = useState(0);
-    const [answer, setAnswer] = useState<any>(null);
-
-    async function onPress() {
-      console.log("onPress");
-      //   const response = await fetchRapidAPIData(_context);
-      //   setAnswer(response);
-    }
-
+  name: 'Experience Post',
+  height: 'tall',
+  render: (context) => {
     return (
-      <vstack height="100%" width="100%" gap="medium" alignment="center middle">
-        <image
-          url="logo.png"
-          description="logo"
-          imageHeight={256}
-          imageWidth={256}
-          height="48px"
-          width="48px"
+      <vstack height="100%" width="100%" alignment="center middle">
+        <webview
+          id={WEBVIEW_ID}
+          url="index.html"
+          width={'100%'}
+          height={'100%'}
+          onMessage={async (event) => {
+            console.log('Received message', event);
+            const data = event as unknown as WebviewToBlockMessage;
+
+            switch (data.type) {
+              case 'INIT':
+                sendMessageToWebview(context, {
+                  type: 'INIT_RESPONSE',
+                  payload: {
+                    postId: context.postId!,
+                  },
+                });
+                break;
+              case 'GET_POKEMON_REQUEST':
+                context.ui.showToast({ text: `Received message: ${JSON.stringify(data)}` });
+                const pokemon = await getPokemonByName(data.payload.name);
+
+                sendMessageToWebview(context, {
+                  type: 'GET_POKEMON_RESPONSE',
+                  payload: {
+                    name: pokemon.name,
+                    number: pokemon.id,
+                  },
+                });
+                break;
+
+              default:
+                console.error('Unknown message type', data satisfies never);
+                break;
+            }
+          }}
         />
-        <text size="large">{`Click counter: ${counter}`}</text>
-        <button appearance="primary" onPress={onPress}>
-          Fetch Data
-        </button>
-        {answer}
       </vstack>
     );
   },
