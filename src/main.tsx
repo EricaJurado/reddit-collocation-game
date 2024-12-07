@@ -4,7 +4,7 @@ import { sendMessageToWebview } from './utils/utils.js';
 import { WebviewToBlockMessage } from '../game/shared.js';
 import { WEBVIEW_ID } from './constants.js';
 import { Preview } from './components/Preview.js';
-import { getPokemonByName } from './core/pokeapi.js';
+import { getPokemonByName } from './core/api.js';
 
 Devvit.addSettings([
   // Just here as an example
