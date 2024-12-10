@@ -1,0 +1,7 @@
+.guess-input {
+    display: flex;
+}
+
+.char-input {
+    width: 20px;
+}

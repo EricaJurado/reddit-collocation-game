@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { GuessInput } from '../components/GuessInput';
 import { convertStringToDate, getPuzzleByDate } from '../../server/serverUtils';
 
@@ -13,19 +13,20 @@ export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
   const [correct, setCorrect] = useState<boolean[]>([]);
 
   useEffect(() => {
-    if (createdAt) {
-      try {
-        const targetDate = convertStringToDate(createdAt);
-        const puzzle = getPuzzleByDate(targetDate);
-        if (!puzzle) {
-          throw new Error('No puzzle found');
-        }
+    if (!createdAt) return;
+    try {
+      const targetDate = convertStringToDate(createdAt);
+      const puzzle = getPuzzleByDate(targetDate);
+
+      if (puzzle && Array.isArray(puzzle)) {
         setWordList(puzzle);
-        setGuessValues(Array(puzzle.length - 1).fill('')); // Initialize guess values for each input
-        setCorrect(Array(puzzle.length - 1).fill(false)); // Initialize correctness for each guess
-      } catch (e) {
-        console.log(e);
+        setGuessValues(Array(puzzle.length - 2).fill(''));
+        setCorrect(Array(puzzle.length - 2).fill(false));
+      } else {
+        console.error('No valid puzzle data found');
       }
+    } catch (error) {
+      console.error('Error processing puzzle date:', error);
     }
   }, [createdAt]);
 
@@ -36,19 +37,32 @@ export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
     setCorrect(newCorrect);
   };
 
-  const [guessedWord, setGuessedWord] = useState('');
-
-  const handleGuessChange = (guessedWord: string) => {
-    setGuessedWord(guessedWord);
-    console.log('Guessed word is:', guessedWord);
+  const handleGuessChange = (newGuess: string, index: number) => {
+    console.log('event: ', newGuess);
+    console.log('index: ', index);
+    const newGuessValues = [...guessValues];
+    newGuessValues[index] = newGuess;
+    setGuessValues(newGuessValues);
   };
+
+  const stableHandleGuessChange = useCallback(
+    (guess: string, idx: number) => handleGuessChange(guess, idx),
+    [guessValues]
+  );
+
+  useEffect(() => {
+    console.log('guessValues:', guessValues);
+  }, [guessValues]);
 
   return (
     <div>
       {wordList[0] && <p>{wordList[0]}</p>}
       {wordList.slice(1, wordList.length - 1).map((word, index) => (
-        <div key={word}>
-          <GuessInput onChange={handleGuessChange} answer={wordList[0] || ''} />
+        <div key={index}>
+          <GuessInput
+            setGuessedWord={(guess) => stableHandleGuessChange(guess, index)}
+            answer={wordList[index + 1] || ''}
+          />
           {correct[index] ? <p>Correct!</p> : <p>Incorrect!</p>}
         </div>
       ))}

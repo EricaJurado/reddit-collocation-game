@@ -28,6 +28,7 @@ function CharInput({
       {letterRevealed && <span>{correctLetter}</span>}
       {!letterRevealed && (
         <input
+          className="char-input"
           ref={inputRef}
           value={value}
           onChange={(e) => {
@@ -52,10 +53,10 @@ interface Guess {
 
 export function GuessInput({
   answer,
-  onChange,
+  setGuessedWord,
 }: {
   answer: string;
-  onChange: (guessedWord: string) => void;
+  setGuessedWord: (guess: string) => void;
 }) {
   const initializeGuessList = (n: number): Guess[] =>
     Array.from({ length: n }, (_, i) => ({
@@ -91,11 +92,13 @@ export function GuessInput({
 
   useEffect(() => {
     const guessedWord = guessList.map((item) => item.value).join('');
-    onChange(guessedWord);
-  }, [guessList, onChange]);
+    if (guessList.length > 0) {
+      setGuessedWord(guessedWord);
+    }
+  }, [guessList]);
 
   return (
-    <div>
+    <div className="guess-input">
       {answer.split('').map((char, i) => (
         <CharInput
           key={i}
