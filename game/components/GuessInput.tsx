@@ -7,6 +7,7 @@ function CharInput({
   changeIndex,
   inputRef,
   onFocus,
+  onSubmit,
 }: {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   letterRevealed: boolean;
@@ -14,12 +15,15 @@ function CharInput({
   changeIndex: (direction: number) => void;
   inputRef: React.Ref<HTMLInputElement>;
   onFocus: () => void;
+  onSubmit: () => void;
 }) {
   const [value, setValue] = useState('');
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && value === '') {
       changeIndex(-1);
+    } else if (e.key === 'Enter') {
+      onSubmit();
     }
   };
 
@@ -54,9 +58,11 @@ interface Guess {
 export function GuessInput({
   answer,
   setGuessedWord,
+  onSubmit,
 }: {
   answer: string;
   setGuessedWord: (guess: string) => void;
+  onSubmit: () => void;
 }) {
   const initializeGuessList = (n: number): Guess[] =>
     Array.from({ length: n }, (_, i) => ({
@@ -64,14 +70,20 @@ export function GuessInput({
       value: '',
     }));
 
-  const [guessList, setGuessList] = useState<Guess[]>(initializeGuessList(answer.length));
+  const initGuessList = initializeGuessList(answer.length);
+  initGuessList[0].value = answer[0];
+  const [guessList, setGuessList] = useState<Guess[]>(initGuessList);
   const inputRefs: React.RefObject<HTMLInputElement>[] = Array.from({ length: answer.length }, () =>
     React.createRef<HTMLInputElement>()
   );
+
+  const initRevealed = new Array(answer.length).fill(false);
+  initRevealed[0] = true;
+  const [revealed, setRevealed] = useState(initRevealed);
   const [index, setIndex] = useState(0);
 
   const handleIndexChange = (direction: number) => {
-    const newIndex = Math.max(0, Math.min(answer.length - 1, index + direction));
+    const newIndex = Math.max(1, Math.min(answer.length - 1, index + direction));
     setIndex(newIndex);
     inputRefs[newIndex]?.current?.focus();
   };
@@ -103,11 +115,12 @@ export function GuessInput({
         <CharInput
           key={i}
           onChange={(e) => updateItem(i, e.target.value)}
-          letterRevealed={false}
+          letterRevealed={revealed[i]}
           correctLetter={char}
           changeIndex={handleIndexChange}
           inputRef={inputRefs[i]}
           onFocus={() => setIndex(i)}
+          onSubmit={onSubmit}
         />
       ))}
     </div>

@@ -20,7 +20,10 @@ export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
 
       if (puzzle && Array.isArray(puzzle)) {
         setWordList(puzzle);
-        setGuessValues(Array(puzzle.length - 2).fill(''));
+        const initGuessValues = puzzle.map((word, index) =>
+          index === 0 || index === puzzle.length - 1 ? word : word[0]
+        );
+        setGuessValues(initGuessValues.slice(1, initGuessValues.length - 1));
         setCorrect(Array(puzzle.length - 2).fill(false));
       } else {
         console.error('No valid puzzle data found');
@@ -62,6 +65,7 @@ export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
           <GuessInput
             setGuessedWord={(guess) => stableHandleGuessChange(guess, index)}
             answer={wordList[index + 1] || ''}
+            onSubmit={() => checkWord(guessValues[index], index)}
           />
           {correct[index] ? <p>Correct!</p> : <p>Incorrect!</p>}
         </div>
