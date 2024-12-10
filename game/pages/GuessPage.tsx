@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CustomInput } from '../components/CustomInput';
-import { sendToDevvit } from '../utils';
-import { useDevvitListener } from '../hooks/useDevvitListener';
-import { Devvit, RedditAPIClient } from '@devvit/public-api';
+import { GuessInput } from '../components/GuessInput';
 import { convertStringToDate, getPuzzleByDate } from '../../server/serverUtils';
 
 interface GuessPageProps {
@@ -11,10 +8,9 @@ interface GuessPageProps {
 }
 
 export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
-  const [value, setValue] = useState('');
-  const [loading, setLoading] = useState(false);
-  //   const pokemon = useDevvitListener('GET_POKEMON_RESPONSE');
-  const [wordList, setWordList] = useState(['']);
+  const [wordList, setWordList] = useState<string[]>([]);
+  const [guessValues, setGuessValues] = useState<string[]>([]);
+  const [correct, setCorrect] = useState<boolean[]>([]);
 
   useEffect(() => {
     if (createdAt) {
@@ -25,57 +21,38 @@ export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
           throw new Error('No puzzle found');
         }
         setWordList(puzzle);
+        setGuessValues(Array(puzzle.length - 1).fill('')); // Initialize guess values for each input
+        setCorrect(Array(puzzle.length - 1).fill(false)); // Initialize correctness for each guess
       } catch (e) {
         console.log(e);
       }
     }
   }, [createdAt]);
 
-  const [correct, setCorrect] = useState([false, false, false]);
+  const checkWord = (word: string, index: number) => {
+    const isCorrect = word === wordList[index + 1];
+    const newCorrect = [...correct];
+    newCorrect[index] = isCorrect;
+    setCorrect(newCorrect);
+  };
 
-  function checkWord(word: string, index: number) {
-    if (word === wordList[index + 1]) {
-      correct[index] = true;
-      setCorrect([...correct]);
-    } else {
-      correct[index] = false;
-      setCorrect([...correct]);
-    }
-  }
+  const [guessedWord, setGuessedWord] = useState('');
+
+  const handleGuessChange = (guessedWord: string) => {
+    setGuessedWord(guessedWord);
+    console.log('Guessed word is:', guessedWord);
+  };
 
   return (
     <div>
       {wordList[0] && <p>{wordList[0]}</p>}
       {wordList.slice(1, wordList.length - 1).map((word, index) => (
         <div key={word}>
-          <CustomInput
-            onChange={(e) => setValue(e.target.value)}
-            onSubmit={() => {
-              console.log(value);
-              console.log(index);
-              checkWord(value, index);
-              //   setLoading(true);
-              //   sendToDevvit({
-              //     type: 'GET_POKEMON_REQUEST',
-              //     payload: { name: word.trim().toLowerCase() },
-              //   });
-            }}
-          />
+          <GuessInput onChange={handleGuessChange} answer={wordList[0] || ''} />
           {correct[index] ? <p>Correct!</p> : <p>Incorrect!</p>}
         </div>
       ))}
       {wordList.at(-1) && <p>{wordList.at(-1)}</p>}
-      {/* <CustomInput
-        onChange={(e) => setValue(e.target.value)}
-        onSubmit={() => {
-          setLoading(true);
-          sendToDevvit({
-            type: 'GET_POKEMON_REQUEST',
-            payload: { name: value.trim().toLowerCase() },
-          });
-        }}
-      />
-      {loading && !pokemon ? <div>Loading...</div> : <p>Pokemon Number: {pokemon?.number}</p>} */}
     </div>
   );
 };
