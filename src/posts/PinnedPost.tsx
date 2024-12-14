@@ -18,7 +18,34 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     <vstack width="100%" height="100%" alignment="center middle">
       {/* Menu */}
       <vstack alignment="center middle" gap="small">
-        <button onClick={() => setPage('test')}>TESTING</button>
+        <hstack
+          alignment="center middle"
+          width="100%"
+          height="100%"
+          padding="small"
+          gap="small"
+          onPress={() => setPage('test')}
+        >
+          <text>TESTING</text>
+        </hstack>
+      </vstack>
+    </vstack>
+  );
+
+  const UGH = (
+    <vstack width="100%" height="100%" alignment="center middle">
+      {/* Menu */}
+      <vstack alignment="center middle" gap="small">
+        <hstack
+          alignment="center middle"
+          width="100%"
+          height="100%"
+          padding="small"
+          gap="small"
+          onPress={() => setPage('menu')}
+        >
+          <text>UGH</text>
+        </hstack>
       </vstack>
     </vstack>
   );
@@ -29,9 +56,11 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
 
   const pages: Record<string, JSX.Element> = {
     menu: Menu,
-    test: Menu,
+    test: UGH,
     // test: <GuessPage postId={''} createdAt={'12-13-2024'} />,
   };
+
+  console.log(page);
 
   return pages[page] || Menu;
 };
