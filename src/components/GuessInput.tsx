@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Context, Devvit, useAsync, useState } from '@devvit/public-api';
 
 function CharInput({
   onChange,
@@ -28,9 +29,9 @@ function CharInput({
   };
 
   return (
-    <div>
-      {letterRevealed && <span>{correctLetter}</span>}
-      {!letterRevealed && (
+    <vstack>
+      {letterRevealed && <text>{correctLetter}</text>}
+      {/* {!letterRevealed && (
         <input
           className="char-input"
           ref={inputRef}
@@ -45,8 +46,8 @@ function CharInput({
           type="text"
           autoCorrect="off"
         />
-      )}
-    </div>
+      )} */}
+    </vstack>
   );
 }
 

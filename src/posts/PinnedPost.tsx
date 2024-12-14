@@ -1,7 +1,7 @@
 import { Context, Devvit, useAsync, useState } from '@devvit/public-api';
-import { Service } from '../../server/Service.js';
 import { GuessPage } from '../pages/GuessPage.js';
-import type { PostData, UserData } from '../shared.js';
+import type { PostData } from '../shared.js';
+import { getPuzzleByDate } from '../../server/serverUtils.js';
 
 interface PinnedPostProps {
   postData: PostData;
@@ -9,10 +9,13 @@ interface PinnedPostProps {
 }
 
 export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Element => {
-  const service = new Service(context);
   const [page, setPage] = useState('menu');
-
-  console.log('pinned post props', props);
+  const wordList = useAsync(async () => {
+    const createdAtDate = new Date(props.postData.createdAt);
+    console.log('createdAtDate:', createdAtDate);
+    const puzzle = getPuzzleByDate(createdAtDate);
+    return puzzle;
+  });
 
   const Menu = (
     <vstack width="100%" height="100%" alignment="center middle">
@@ -32,35 +35,14 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     </vstack>
   );
 
-  const UGH = (
-    <vstack width="100%" height="100%" alignment="center middle">
-      {/* Menu */}
-      <vstack alignment="center middle" gap="small">
-        <hstack
-          alignment="center middle"
-          width="100%"
-          height="100%"
-          padding="small"
-          gap="small"
-          onPress={() => setPage('menu')}
-        >
-          <text>UGH</text>
-        </hstack>
-      </vstack>
-    </vstack>
-  );
-
-  const onClose = (): void => {
-    setPage('menu');
-  };
-
   const pages: Record<string, JSX.Element> = {
     menu: Menu,
-    test: UGH,
-    // test: <GuessPage postId={''} createdAt={'12-13-2024'} />,
+    test: !wordList
+      ? <text>Loading...</text>
+      : Array.isArray(wordList.data)
+      ? <GuessPage wordList={wordList.data} />
+      : <text>Error: Could not load puzzle data.</text>,
   };
-
-  console.log(page);
 
   return pages[page] || Menu;
 };

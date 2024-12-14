@@ -5,16 +5,13 @@ import { GuessInput } from '../components/GuessInput.js';
 import { convertStringToDate, getPuzzleByDate } from '../../server/serverUtils.js';
 
 interface GuessPageProps {
-  postId: string;
-  createdAt: string;
+  wordList: string[];
 }
 
 export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element => {
-  const [wordList, setWordList] = useState<string[]>([]);
+  const [wordList, setWordList] = useState<string[]>(props.wordList);
   const [guessValues, setGuessValues] = useState<string[]>([]);
   const [correct, setCorrect] = useState<boolean[]>([]);
-
-  console.log('props.createdAt:', props.createdAt);
 
   // useEffect(() => {
   //   console.log('props.createdAt:', props.createdAt);
@@ -38,41 +35,35 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
   //   }
   // }, [props.createdAt]);
 
-  // const checkWord = (word: string, index: number) => {
-  //   const isCorrect = word === wordList[index + 1];
-  //   const newCorrect = [...correct];
-  //   newCorrect[index] = isCorrect;
-  //   setCorrect(newCorrect);
-  // };
+  const checkWord = (word: string, index: number) => {
+    const isCorrect = word === wordList[index + 1];
+    const newCorrect = [...correct];
+    newCorrect[index] = isCorrect;
+    setCorrect(newCorrect);
+  };
 
-  // const handleGuessChange = (newGuess: string, index: number) => {
-  //   console.log('event: ', newGuess);
-  //   console.log('index: ', index);
-  //   const newGuessValues = [...guessValues];
-  //   newGuessValues[index] = newGuess;
-  //   setGuessValues(newGuessValues);
-  // };
-
-  // const stableHandleGuessChange = useCallback(
-  //   (guess: string, idx: number) => handleGuessChange(guess, idx),
-  //   [guessValues]
-  // );
+  const handleGuessChange = (newGuess: string, index: number) => {
+    console.log('event: ', newGuess);
+    console.log('index: ', index);
+    const newGuessValues = [...guessValues];
+    newGuessValues[index] = newGuess;
+    setGuessValues(newGuessValues);
+  };
 
   return (
     <vstack>
-      <text>{wordList[0]}</text>
-      {/* {wordList[0] && <text>{wordList[0]}</text>} */}
-      {/* {wordList.slice(1, wordList.length - 1).map((word, index) => (
-        <div key={index}>
+      {wordList[0] && <text>{wordList[0]}</text>}
+      {wordList.slice(1, wordList.length - 1).map((word, index) => (
+        <vstack>
           <GuessInput
-            setGuessedWord={(guess) => stableHandleGuessChange(guess, index)}
+            setGuessedWord={(guess) => handleGuessChange(guess, index)}
             answer={wordList[index + 1] || ''}
             onSubmit={() => checkWord(guessValues[index], index)}
           />
-          {correct[index] ? <p>Correct!</p> : <p>Incorrect!</p>}
-        </div>
+          {correct[index] ? <text>Correct!</text> : <text>Incorrect!</text>}
+        </vstack>
       ))}
-      {wordList.at(-1) && <p>{wordList.at(-1)}</p>} */}
+      {/* {wordList.at(-1) && <text>{wordList.at(-1)}</text>} */}
     </vstack>
   );
 };

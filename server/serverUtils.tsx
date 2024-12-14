@@ -15,11 +15,10 @@ function convertStringToDate(date: string): Date {
 }
 
 function getPuzzleByDate(date: Date): string[] | null {
+  console.log(date);
   const data: JsonData = puzzles;
   const targetDate = date.getMonth() + 1 + '-' + date.getDate() + '-' + date.getFullYear();
-  console.log(targetDate);
-  console.log(data);
-
+  console.log('targetDate:', targetDate);
   const dailyPuzzle = data?.[targetDate];
   return dailyPuzzle;
 }

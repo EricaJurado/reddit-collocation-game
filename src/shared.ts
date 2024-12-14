@@ -11,12 +11,14 @@ export type SubredditId = `t5_${string}`;
 export type PostData = {
   postId: PostId;
   postType: string;
+  createdAt: string;
 };
 
 // Pinned post
 export type PinnedPostData = {
   postId: PostId;
   postType: string;
+  createdAt: string;
 };
 
 // TODO: daily post

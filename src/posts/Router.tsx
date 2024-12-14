@@ -48,10 +48,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     postType: PostType;
     username: string | null;
   }>(async () => {
-    // First batch
     const [postType, username] = await Promise.all([service.getPostType(postId), getUsername()]);
-
-    // Second batch
     const [postData] = await Promise.all([getPostData(postType, postId)]);
     return {
       postData,
@@ -59,8 +56,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
       username,
     };
   });
-
-  console.log(data);
 
   const postTypes: Record<string, JSX.Element> = {
     drawing: (
@@ -74,12 +69,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
       </vstack>
     ),
     pinned: <PinnedPost postData={data.postData as PostData} username={data.username} />,
-    // Add more post types here
   };
-
-  /*
-   * Return the custom post unit
-   */
 
   return (
     <zstack width="100%" height="100%" alignment="top start">

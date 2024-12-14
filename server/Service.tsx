@@ -1,15 +1,11 @@
 import type {
-  Post,
   RedditAPIClient,
   RedisClient,
   Scheduler,
-  ZRangeOptions,
 } from '@devvit/public-api';
 
 import type {
-  //   DrawingPostData,
   PinnedPostData,
-  PostData,
   UserData,
   PostId,
   PostType,
@@ -25,10 +21,6 @@ export class Service {
     this.reddit = context.reddit;
     this.scheduler = context.scheduler;
   }
-
-  readonly tags = {
-    scores: 'default',
-  };
 
   readonly keys = {
     postGuesses: (postId: PostId) => `guesses:${postId}`,
@@ -56,31 +48,40 @@ export class Service {
    * Post data
    */
 
-  async getPostType(postId: PostId) {
+  async getPostType(postId: PostId): Promise<PostType> {
     const key = this.keys.postData(postId);
     const postType = await this.redis.hGet(key, 'postType');
-    const defaultPostType = 'drawing';
+    const defaultPostType = 'daily';
     return (postType ?? defaultPostType) as PostType;
+  }
+
+  async getPostCreatedAt(postId: PostId): Promise<Date> {
+    const key = this.keys.postData(postId);
+    const createdAt = await this.redis.hGet(key, 'createdAt');
+    return createdAt ? new Date(createdAt) : new Date();
   }
 
   /*
    * Pinned Post
    */
 
-  async savePinnedPost(postId: PostId): Promise<void> {
+  async savePinnedPost(postId: PostId, createdAt: Date): Promise<void> {
     const key = this.keys.postData(postId);
     await this.redis.hSet(key, {
       postId,
       postType: 'pinned',
+      createdAt: createdAt.toISOString(),
     });
   }
 
   async getPinnedPost(postId: PostId): Promise<PinnedPostData> {
     const key = this.keys.postData(postId);
     const postType = await this.redis.hGet(key, 'postType');
+    const createdAt = await this.redis.hGet(key, 'createdAt');
     return {
       postId,
       postType: postType ?? 'pinned',
+      createdAt: createdAt ?? new Date().toISOString(),
     };
   }
 }

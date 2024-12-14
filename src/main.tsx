@@ -74,7 +74,7 @@ Devvit.addMenuItem({
     });
     ui.showToast({ text: 'Created post!' });
     await post.sticky();
-    await service.savePinnedPost(post.id);
+    await service.savePinnedPost(post.id, post.createdAt);
     ui.navigateTo(post.url);
   },
 });
