@@ -1,3 +1,4 @@
+import { Devvit } from '@devvit/public-api';
 import { useRef, useState } from 'react';
 
 export function CustomInput({

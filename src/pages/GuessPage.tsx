@@ -1,21 +1,24 @@
+import { Devvit, type Context } from '@devvit/public-api';
+
 import { useCallback, useEffect, useState } from 'react';
-import { GuessInput } from '../components/GuessInput';
-import { convertStringToDate, getPuzzleByDate } from '../../server/serverUtils';
+import { GuessInput } from '../components/GuessInput.js';
+import { convertStringToDate, getPuzzleByDate } from '../../server/serverUtils.js';
 
 interface GuessPageProps {
   postId: string;
   createdAt: string;
 }
 
-export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
+export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element => {
+  // export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
   const [wordList, setWordList] = useState<string[]>([]);
   const [guessValues, setGuessValues] = useState<string[]>([]);
   const [correct, setCorrect] = useState<boolean[]>([]);
 
   useEffect(() => {
-    if (!createdAt) return;
+    if (!props.createdAt) return;
     try {
-      const targetDate = convertStringToDate(createdAt);
+      const targetDate = convertStringToDate(props.createdAt);
       const puzzle = getPuzzleByDate(targetDate);
 
       if (puzzle && Array.isArray(puzzle)) {
@@ -31,7 +34,7 @@ export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
     } catch (error) {
       console.error('Error processing puzzle date:', error);
     }
-  }, [createdAt]);
+  }, [props.createdAt]);
 
   const checkWord = (word: string, index: number) => {
     const isCorrect = word === wordList[index + 1];
@@ -58,9 +61,9 @@ export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
   }, [guessValues]);
 
   return (
-    <div>
+    <vstack>
       {wordList[0] && <p>{wordList[0]}</p>}
-      {wordList.slice(1, wordList.length - 1).map((word, index) => (
+      {/* {wordList.slice(1, wordList.length - 1).map((word, index) => (
         <div key={index}>
           <GuessInput
             setGuessedWord={(guess) => stableHandleGuessChange(guess, index)}
@@ -70,7 +73,7 @@ export const GuessPage = ({ postId, createdAt }: GuessPageProps) => {
           {correct[index] ? <p>Correct!</p> : <p>Incorrect!</p>}
         </div>
       ))}
-      {wordList.at(-1) && <p>{wordList.at(-1)}</p>}
-    </div>
+      {wordList.at(-1) && <p>{wordList.at(-1)}</p>} */}
+    </vstack>
   );
 };

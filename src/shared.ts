@@ -1,0 +1,37 @@
+export type Page =
+  | "home"
+  | "pokemon";
+
+export type CommentId = `t1_${string}`;
+export type UserId = `t2_${string}`;
+export type PostId = `t3_${string}`;
+export type SubredditId = `t5_${string}`;
+
+// Pinned post
+export type PinnedPostData = {
+  postId: PostId;
+  postType: string;
+};
+
+// TODO: daily post
+// TODO: usergen post
+
+
+export enum PostType {
+  USERGEN = 'usergen',
+  DAILY = 'daily',
+  PINNED = 'pinned',
+}
+
+
+// Base post data
+export type PostData = {
+  postId: PostId;
+  postType: string;
+};
+
+
+export type UserData = {
+  solved: boolean; // Has the user solved this post?
+  guessCount: number;
+};
