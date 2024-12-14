@@ -1,6 +1,7 @@
 import { Devvit, useAsync, useState } from '@devvit/public-api';
 import { DEVVIT_SETTINGS_KEYS } from './constants.js';
 import { Router } from './posts/Router.js';
+import { Service } from '../server/Service.js';
 
 Devvit.addSettings([
   // Just here as an example
@@ -52,24 +53,31 @@ Devvit.addTrigger({
   },
 });
 
-// Devvit.addMenuItem({
-//   // Please update as you work on your idea!
-//   label: 'Make my experience post',
-//   location: 'subreddit',
-//   forUserType: 'moderator',
-//   onPress: async (_event, context) => {
-//     const { reddit, ui } = context;
-//     const subreddit = await reddit.getCurrentSubreddit();
-//     const post = await reddit.submitPost({
-//       // Title of the post. You'll want to update!
-//       title: 'My first experience post',
-//       subredditName: subreddit.name,
-//       preview: <Preview />,
-//     });
-//     ui.showToast({ text: 'Created post!' });
-//     ui.navigateTo(post.url);
-//   },
-// });
+Devvit.addMenuItem({
+  // Please update as you work on your idea!
+  label: 'Make my experience post',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const { reddit, ui } = context;
+    const service = new Service(context);
+    const subreddit = await reddit.getCurrentSubreddit();
+    const post = await reddit.submitPost({
+      // Title of the post. You'll want to update!
+      title: 'My first experience post',
+      subredditName: subreddit.name,
+      preview: (
+        <vstack>
+            <text>Loading...</text>
+        </vstack>
+      )
+    });
+    ui.showToast({ text: 'Created post!' });
+    await post.sticky();
+    await service.savePinnedPost(post.id);
+    ui.navigateTo(post.url);
+  },
+});
 
 // Add a post type definition
 Devvit.addCustomPostType({

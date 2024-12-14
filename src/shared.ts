@@ -7,6 +7,12 @@ export type UserId = `t2_${string}`;
 export type PostId = `t3_${string}`;
 export type SubredditId = `t5_${string}`;
 
+// Base post data
+export type PostData = {
+  postId: PostId;
+  postType: string;
+};
+
 // Pinned post
 export type PinnedPostData = {
   postId: PostId;
@@ -22,13 +28,6 @@ export enum PostType {
   DAILY = 'daily',
   PINNED = 'pinned',
 }
-
-
-// Base post data
-export type PostData = {
-  postId: PostId;
-  postType: string;
-};
 
 
 export type UserData = {

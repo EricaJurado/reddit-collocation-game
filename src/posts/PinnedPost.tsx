@@ -12,6 +12,8 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
   const service = new Service(context);
   const [page, setPage] = useState('menu');
 
+  console.log('pinned post props', props);
+
   const Menu = (
     <vstack width="100%" height="100%" alignment="center middle">
       {/* Menu */}

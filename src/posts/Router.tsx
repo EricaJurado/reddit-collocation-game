@@ -2,7 +2,7 @@ import type { Context } from '@devvit/public-api';
 import { Devvit, useState } from '@devvit/public-api';
 
 import { Service } from '../../server/Service.js';
-import type { PinnedPostData, PostId } from '../shared.js';
+import type { PinnedPostData, PostId, PostData } from '../shared.js';
 import { PinnedPost } from './PinnedPost.js';
 import { PostType } from '../shared.js';
 /*
@@ -53,7 +53,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
 
     // Second batch
     const [postData] = await Promise.all([getPostData(postType, postId)]);
-    console.log('postData', postData);
     return {
       postData,
       postType,
@@ -64,17 +63,17 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
   console.log(data);
 
   const postTypes: Record<string, JSX.Element> = {
-    pinned: (
-      <vstack>
-        <text>pinned</text>
-      </vstack>
-    ),
     drawing: (
       <vstack>
         <text>drawing</text>
       </vstack>
     ),
-    // pinned: <PinnedPost postData={data as PinnedPostData} username={data.username} />,
+    collection: (
+      <vstack>
+        <text>collection</text>
+      </vstack>
+    ),
+    pinned: <PinnedPost postData={data.postData as PostData} username={data.username} />,
     // Add more post types here
   };
 
