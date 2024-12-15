@@ -4,6 +4,7 @@ import type { PostData } from '../shared.js';
 import { getPuzzleByDate } from '../../server/serverUtils.js';
 import { Service } from '../../server/Service.js';
 import { formatCreatedAtDate } from '../utils.js';
+import { MenuHomePage } from '../pages/MenuHomePage.js';
 
 interface DailyPostProps {
   postData: PostData;
@@ -56,11 +57,7 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
     ) : (
       <text>Error: Could not load puzzle data.</text>
     ),
-    menu: (
-      <vstack>
-        <text>Leaderboard</text>
-      </vstack>
-    ),
+    menu: <MenuHomePage username={props.username} postData={props.postData} pageSetter={setPage} />,
   };
 
   return (

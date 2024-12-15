@@ -67,8 +67,6 @@ export class Service {
     const key = this.keys.postData(postId);
     const postType = await this.redis.hGet(key, 'postType');
     const createdAt = await this.redis.hGet(key, 'createdAt');
-    console.log('getting date for post ' + createdAt);
-    console.log('getting type for post ' + postType);
     return {
       postId,
       postType: postType ?? 'pinned',
@@ -82,7 +80,6 @@ export class Service {
 
   async saveDailyPost(postId: PostId, createdAt: Date): Promise<void> {
     const key = this.keys.postData(postId);
-    console.log(createdAt);
     await this.redis.hSet(key, {
       postId,
       postType: 'daily',
@@ -96,7 +93,6 @@ export class Service {
     let createdAt = await this.redis.hGet(key, 'createdAt');
     // if daily post was created before we started storing createdAt, get it from reddit
     if (!createdAt) {
-      console.log('daily not found, adding it now... ' + postId);
       const postInfo = await this.reddit?.getPostById(postId);
       createdAt = postInfo?.createdAt.toString();
       await this.redis.hSet(key, {
@@ -104,8 +100,6 @@ export class Service {
         postType: postType ?? 'daily',
         createdAt: postInfo?.createdAt.toString() ?? new Date().toString(),
       });
-    } else {
-      console.log('found daily post ' + postId + ' ' + createdAt);
     }
     return {
       postId,
@@ -160,7 +154,6 @@ export class Service {
     const key = this.keys.userDailySolved(username);
     const currentData = await this.redis.hGet(key, 'list');
     const solvedDays = currentData ? JSON.parse(currentData) : [];
-    console.log(solvedDays);
     if (!solvedDays.includes(day)) {
       solvedDays.push(day);
       await this.redis.hSet(key, { list: JSON.stringify(solvedDays) });

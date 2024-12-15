@@ -9,10 +9,9 @@ interface GuessPageProps {
 }
 
 export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element => {
-  const [wordList, setWordList] = useState<string[]>(props.wordList);
+  const [wordList] = useState<string[]>(props.wordList);
   const [guessValues, setGuessValues] = useState<string[]>([]);
   const [correct, setCorrect] = useState<boolean[]>(new Array(wordList.length - 2).fill(false));
-  const [current, setCurrent] = useState<number>(0);
 
   const checkWord = (word: string, index: number) => {
     const isCorrect = word === wordList[index + 1];
@@ -20,21 +19,13 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
     newCorrect[index] = isCorrect;
     setCorrect(newCorrect);
 
-    console.log(newCorrect);
     // check if correct is list of all true
     if (newCorrect.every((value) => value === true)) {
-      // all correct
-      console.log('all correct');
       props.solvedSetter();
-    } else {
-      // not all correct
-      console.log('not all correct');
     }
   };
 
   const handleGuessChange = (newGuess: string, index: number) => {
-    console.log('event: ', newGuess);
-    console.log('index: ', index);
     const newGuessValues = [...guessValues];
     newGuessValues[index] = newGuess;
     setGuessValues(newGuessValues);

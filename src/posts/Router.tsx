@@ -51,10 +51,8 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     postType: PostType;
     username: string | null;
   }>(async () => {
-    console.log(postId);
     const [postType, username] = await Promise.all([service.getPostType(postId), getUsername()]);
     const [postData] = await Promise.all([getPostData(postType, postId)]);
-    console.log(postData);
     return {
       postData,
       postType,

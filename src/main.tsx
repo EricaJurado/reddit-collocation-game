@@ -37,7 +37,6 @@ Devvit.addSchedulerJob({
     });
     const service = new Service(context);
     await service.saveDailyPost(resp.id, resp.createdAt);
-    console.log('posted resp', JSON.stringify(resp));
   },
 });
 
@@ -84,7 +83,7 @@ Devvit.addMenuItem({
   },
 });
 
-// for testing daily
+// for testing daily - currently daily should be auto scheduled on app install
 Devvit.addMenuItem({
   label: 'Daily Post',
   location: 'subreddit',

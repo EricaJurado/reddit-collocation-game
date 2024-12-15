@@ -4,6 +4,8 @@ import type { PostData } from '../shared.js';
 import { getPuzzleByDate } from '../../server/serverUtils.js';
 import { Service } from '../../server/Service.js';
 import { formatCreatedAtDate } from '../utils.js';
+import { MenuHomePage } from '../pages/MenuHomePage.js';
+import { WinPage } from '../pages/WinPage.js';
 
 interface PinnedPostProps {
   postData: PostData;
@@ -37,73 +39,24 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
   const saveDailySolved = async () => {
     if (props.username) {
       service.addDailySolvedPuzzle(props.username, todaysDate);
-      setPage('menu');
+      setPage('win');
     }
   };
 
-  const Menu = (
-    <vstack width="100%" height="100%" alignment="center middle">
-      {/* Menu */}
-      <vstack alignment="center middle" gap="small">
-        <hstack
-          alignment="center middle"
-          width="100%"
-          height="100%"
-          padding="small"
-          gap="small"
-          onPress={() => setPage('test')}
-        >
-          <text>Today's Puzzle</text>
-          {isDailySolved ? <text>✅</text> : <text>❌</text>}
-        </hstack>
-      </vstack>
-      <vstack alignment="center middle" gap="small">
-        <hstack
-          alignment="center middle"
-          width="100%"
-          height="100%"
-          padding="small"
-          gap="small"
-          onPress={() => setPage('test')}
-        >
-          <text>My Stats</text>
-        </hstack>
-      </vstack>
-      <vstack alignment="center middle" gap="small">
-        <hstack
-          alignment="center middle"
-          width="100%"
-          height="100%"
-          padding="small"
-          gap="small"
-          onPress={() => setPage('leaderboard')}
-        >
-          <text>Leaderboard</text>
-        </hstack>
-      </vstack>
-      <vstack alignment="center middle" gap="small">
-        <hstack
-          alignment="center middle"
-          width="100%"
-          height="100%"
-          padding="small"
-          gap="small"
-          onPress={() => setPage('howto')}
-        >
-          <text>How To Play</text>
-        </hstack>
-      </vstack>
-    </vstack>
-  );
-
   const pages: Record<string, JSX.Element> = {
-    menu: Menu,
-    test: !wordList ? (
+    menu: <MenuHomePage username={props.username} postData={props.postData} pageSetter={setPage} />,
+    win: <WinPage winType={isDailySolved ? 'daily' : 'weekly'} onNext={() => setPage('menu')} />,
+    daily: !wordList ? (
       <text>Loading...</text>
     ) : Array.isArray(wordList.data) ? (
       <GuessPage wordList={wordList.data} solvedSetter={saveDailySolved} />
     ) : (
       <text>Error: Could not load puzzle data.</text>
+    ),
+    stats: (
+      <vstack>
+        <text>My Stats</text>
+      </vstack>
     ),
     leaderboard: (
       <vstack>
@@ -120,7 +73,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
   return (
     <vstack key={page}>
       <text>Current page: {page}</text> {/* Log the page state */}
-      {pages[page] || Menu}
+      {pages[page]}
     </vstack>
   );
 };
