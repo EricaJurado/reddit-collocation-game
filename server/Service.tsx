@@ -50,6 +50,15 @@ export class Service {
     return createdAt ? new Date(createdAt) : new Date();
   }
 
+  async saveDailyPost(postId: PostId, createdAt: Date): Promise<void> {
+    const key = this.keys.postData(postId);
+    await this.redis.hSet(key, {
+      postId,
+      postType: 'daily',
+      createdAt: createdAt.toISOString(),
+    });
+  }
+
   /*
    * Pinned Post
    */
@@ -120,6 +129,7 @@ export class Service {
     const key = this.keys.userDailySolved(username);
     const currentData = await this.redis.hGet(key, 'list');
     const solvedDays = currentData ? JSON.parse(currentData) : [];
+    console.log(solvedDays);
     if (!solvedDays.includes(day)) {
       solvedDays.push(day);
       await this.redis.hSet(key, { list: JSON.stringify(solvedDays) });

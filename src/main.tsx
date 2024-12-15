@@ -2,6 +2,7 @@ import { Devvit, useAsync, useState } from '@devvit/public-api';
 import { DEVVIT_SETTINGS_KEYS } from './constants.js';
 import { Router } from './posts/Router.js';
 import { Service } from '../server/Service.js';
+import { formatCreatedAtDate } from './utils.js';
 
 Devvit.addSettings([
   // Just here as an example
@@ -27,11 +28,15 @@ Devvit.addSchedulerJob({
   onRun: async (_, context) => {
     console.log('daily_thread handler called');
     const subreddit = await context.reddit.getCurrentSubreddit();
+    const now = new Date();
+    const formattedNow = formatCreatedAtDate(now);
     const resp = await context.reddit.submitPost({
       subredditName: subreddit.name,
-      title: 'Daily Thread',
+      title: `Daily Puzzle ${formattedNow}`,
       text: 'This is a daily thread, comment here!',
     });
+    const service = new Service(context);
+    await service.saveDailyPost(resp.id, resp.createdAt);
     console.log('posted resp', JSON.stringify(resp));
   },
 });
@@ -55,7 +60,7 @@ Devvit.addTrigger({
 
 Devvit.addMenuItem({
   // Please update as you work on your idea!
-  label: 'Make my experience post',
+  label: 'Create Pinned Post',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
@@ -64,17 +69,41 @@ Devvit.addMenuItem({
     const subreddit = await reddit.getCurrentSubreddit();
     const post = await reddit.submitPost({
       // Title of the post. You'll want to update!
-      title: 'My first experience post',
+      title: 'Collocation Game',
       subredditName: subreddit.name,
       preview: (
         <vstack>
-            <text>Loading...</text>
+          <text>Loading...</text>
         </vstack>
-      )
+      ),
     });
     ui.showToast({ text: 'Created post!' });
     await post.sticky();
     await service.savePinnedPost(post.id, post.createdAt);
+    ui.navigateTo(post.url);
+  },
+});
+
+// for testing daily - remove later
+Devvit.addMenuItem({
+  label: 'Daily Post',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const { reddit, ui } = context;
+    const subreddit = await reddit.getCurrentSubreddit();
+    const post = await reddit.submitPost({
+      title: 'Daily Post',
+      subredditName: subreddit.name,
+      preview: (
+        <vstack>
+          <text>Loading...</text>
+        </vstack>
+      ),
+    });
+    ui.showToast({ text: 'Created post!' });
+    const service = new Service(context);
+    await service.saveDailyPost(post.id, post.createdAt);
     ui.navigateTo(post.url);
   },
 });

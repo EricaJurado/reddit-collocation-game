@@ -3,6 +3,7 @@ import { GuessPage } from '../pages/GuessPage.js';
 import type { PostData } from '../shared.js';
 import { getPuzzleByDate } from '../../server/serverUtils.js';
 import { Service } from '../../server/Service.js';
+import { formatCreatedAtDate } from '../utils.js';
 
 interface PinnedPostProps {
   postData: PostData;
@@ -19,10 +20,33 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     return puzzle;
   });
 
+  const [isDailySolved] = useState(async () => {
+    if (props.username) {
+      const puzzleList = await service.getDailySolvedPuzzles(props.username);
+      console.log('puzzleList:', puzzleList);
+      const targetDate = formatCreatedAtDate(new Date(props.postData.createdAt));
+      const isDailyInSolvedList = puzzleList.includes(targetDate) ? true : false;
+      console.log('isDailyInSolvedList:', isDailyInSolvedList);
+      return isDailyInSolvedList;
+    } else {
+      return false;
+    }
+  });
+
   const saveDailySolved = async () => {
     console.log('saving daily solved');
     if (props.username) {
-      service.addDailySolvedPuzzle(props.username, props.postData.createdAt);
+      console.log(props.postData.createdAt);
+      const createdAtDate = new Date(props.postData.createdAt);
+      const targetDate =
+        createdAtDate.getMonth() +
+        1 +
+        '-' +
+        createdAtDate.getDate() +
+        '-' +
+        createdAtDate.getFullYear();
+      console.log('targetDate:', targetDate);
+      service.addDailySolvedPuzzle(props.username, targetDate);
       console.log('Puzzle saved. Changing page to menu.');
       setPage('menu');
     }
@@ -41,6 +65,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
           onPress={() => setPage('test')}
         >
           <text>Today's Puzzle</text>
+          {isDailySolved ? <text>✅</text> : <text>❌</text>}
         </hstack>
       </vstack>
       <vstack alignment="center middle" gap="small">
