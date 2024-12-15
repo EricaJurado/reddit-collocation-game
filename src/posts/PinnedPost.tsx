@@ -2,6 +2,7 @@ import { Context, Devvit, useAsync, useState } from '@devvit/public-api';
 import { GuessPage } from '../pages/GuessPage.js';
 import type { PostData } from '../shared.js';
 import { getPuzzleByDate } from '../../server/serverUtils.js';
+import { Service } from '../../server/Service.js';
 
 interface PinnedPostProps {
   postData: PostData;
@@ -9,6 +10,7 @@ interface PinnedPostProps {
 }
 
 export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Element => {
+  const service = new Service(context);
   const [page, setPage] = useState('menu');
   const wordList = useAsync(async () => {
     const createdAtDate = new Date(props.postData.createdAt);
@@ -16,6 +18,15 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     const puzzle = getPuzzleByDate(createdAtDate);
     return puzzle;
   });
+
+  const saveDailySolved = async () => {
+    console.log('saving daily solved');
+    if (props.username) {
+      service.addDailySolvedPuzzle(props.username, props.postData.createdAt);
+      console.log('Puzzle saved. Changing page to menu.');
+      setPage('menu');
+    }
+  };
 
   const Menu = (
     <vstack width="100%" height="100%" alignment="center middle">
@@ -76,7 +87,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     test: !wordList ? (
       <text>Loading...</text>
     ) : Array.isArray(wordList.data) ? (
-      <GuessPage wordList={wordList.data} />
+      <GuessPage wordList={wordList.data} solvedSetter={saveDailySolved} />
     ) : (
       <text>Error: Could not load puzzle data.</text>
     ),
@@ -92,5 +103,10 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     ),
   };
 
-  return pages[page] || Menu;
+  return (
+    <vstack key={page}>
+      <text>Current page: {page}</text> {/* Log the page state */}
+      {pages[page] || Menu}
+    </vstack>
+  );
 };
