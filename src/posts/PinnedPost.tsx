@@ -10,44 +10,33 @@ interface PinnedPostProps {
   username: string | null;
 }
 
+// pinned post should start by showing menu/home page
+// menu should have options for today's puzzle, my stats, leaderboard, how to play
 export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Element => {
   const service = new Service(context);
   const [page, setPage] = useState('menu');
-  const wordList = useAsync(async () => {
-    const createdAtDate = new Date(props.postData.createdAt);
-    console.log('createdAtDate:', createdAtDate);
-    const puzzle = getPuzzleByDate(createdAtDate);
-    return puzzle;
-  });
+
+  const today = new Date();
+  const todaysDate = formatCreatedAtDate(today);
 
   const [isDailySolved] = useState(async () => {
     if (props.username) {
       const puzzleList = await service.getDailySolvedPuzzles(props.username);
-      console.log('puzzleList:', puzzleList);
-      const targetDate = formatCreatedAtDate(new Date(props.postData.createdAt));
-      const isDailyInSolvedList = puzzleList.includes(targetDate) ? true : false;
-      console.log('isDailyInSolvedList:', isDailyInSolvedList);
+      const isDailyInSolvedList = puzzleList.includes(todaysDate) ? true : false;
       return isDailyInSolvedList;
     } else {
       return false;
     }
   });
 
+  const wordList = useAsync(async () => {
+    const puzzle = getPuzzleByDate(today);
+    return puzzle;
+  });
+
   const saveDailySolved = async () => {
-    console.log('saving daily solved');
     if (props.username) {
-      console.log(props.postData.createdAt);
-      const createdAtDate = new Date(props.postData.createdAt);
-      const targetDate =
-        createdAtDate.getMonth() +
-        1 +
-        '-' +
-        createdAtDate.getDate() +
-        '-' +
-        createdAtDate.getFullYear();
-      console.log('targetDate:', targetDate);
-      service.addDailySolvedPuzzle(props.username, targetDate);
-      console.log('Puzzle saved. Changing page to menu.');
+      service.addDailySolvedPuzzle(props.username, todaysDate);
       setPage('menu');
     }
   };

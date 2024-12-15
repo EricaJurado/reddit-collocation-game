@@ -5,6 +5,7 @@ import { Service } from '../../server/Service.js';
 import type { PinnedPostData, PostId, PostData } from '../shared.js';
 import { PinnedPost } from './PinnedPost.js';
 import { PostType } from '../shared.js';
+import { DailyPost } from './DailyPost.js';
 /*
  * Page Router
  *
@@ -38,6 +39,8 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     switch (postType) {
       case PostType.PINNED:
         return service.getPinnedPost(postId);
+      case PostType.DAILY:
+        return service.getDailyPost(postId);
       default:
         return service.getPinnedPost(postId);
     }
@@ -48,8 +51,10 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     postType: PostType;
     username: string | null;
   }>(async () => {
+    console.log(postId);
     const [postType, username] = await Promise.all([service.getPostType(postId), getUsername()]);
     const [postData] = await Promise.all([getPostData(postType, postId)]);
+    console.log(postData);
     return {
       postData,
       postType,
@@ -58,16 +63,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
   });
 
   const postTypes: Record<string, JSX.Element> = {
-    drawing: (
-      <vstack>
-        <text>drawing</text>
-      </vstack>
-    ),
-    collection: (
-      <vstack>
-        <text>collection</text>
-      </vstack>
-    ),
+    daily: <DailyPost postData={data.postData as PostData} username={data.username} />,
     pinned: <PinnedPost postData={data.postData as PostData} username={data.username} />,
   };
 

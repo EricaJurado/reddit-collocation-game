@@ -84,7 +84,7 @@ Devvit.addMenuItem({
   },
 });
 
-// for testing daily - remove later
+// for testing daily
 Devvit.addMenuItem({
   label: 'Daily Post',
   location: 'subreddit',
@@ -92,8 +92,10 @@ Devvit.addMenuItem({
   onPress: async (_event, context) => {
     const { reddit, ui } = context;
     const subreddit = await reddit.getCurrentSubreddit();
+    const now = new Date();
+    const formattedNow = formatCreatedAtDate(now);
     const post = await reddit.submitPost({
-      title: 'Daily Post',
+      title: `Daily Puzzle ${formattedNow}`,
       subredditName: subreddit.name,
       preview: (
         <vstack>
@@ -113,64 +115,6 @@ Devvit.addCustomPostType({
   name: 'Experience Post',
   height: 'tall',
   render: Router,
-  //   render: (context) => {
-  //     return (
-  //       <vstack height="100%" width="100%" alignment="center middle">
-  //         <webview
-  //           id={WEBVIEW_ID}
-  //           url="index.html"
-  //           width={'100%'}
-  //           height={'100%'}
-  //           onMessage={async (event) => {
-  //             console.log('Received message', event);
-  //             const data = event as unknown as WebviewToBlockMessage;
-
-  //             switch (data.type) {
-  //               case 'INIT':
-  //                 try {
-  //                   const postResponse = await context.reddit.getPostById(context.postId!);
-  //                   const createdAt = postResponse?.createdAt ?? '';
-  //                   sendMessageToWebview(context, {
-  //                     type: 'INIT_RESPONSE',
-  //                     payload: {
-  //                       postId: context.postId!,
-  //                       createdAt: createdAt.toString(),
-  //                     },
-  //                   });
-  //                 } catch (error) {
-  //                   console.error('Failed to fetch Reddit post details:', error);
-  //                   sendMessageToWebview(context, {
-  //                     type: 'INIT_RESPONSE',
-  //                     payload: {
-  //                       postId: context.postId!,
-  //                       createdAt: '',
-  //                     },
-  //                   });
-  //                 }
-  //                 break;
-
-  //               // case 'GET_POKEMON_REQUEST':
-  //               //   context.ui.showToast({ text: `Received message: ${JSON.stringify(data)}` });
-  //               //   const pokemon = await getPokemonByName(data.payload.name);
-
-  //               //   sendMessageToWebview(context, {
-  //               //     type: 'GET_POKEMON_RESPONSE',
-  //               //     payload: {
-  //               //       name: pokemon.name,
-  //               //       number: pokemon.id,
-  //               //     },
-  //               //   });
-  //               //   break;
-
-  //               default:
-  //                 console.error('Unknown message type', data satisfies never);
-  //                 break;
-  //             }
-  //           }}
-  //         />
-  //       </vstack>
-  //     );
-  //   },
 });
 
 export default Devvit;

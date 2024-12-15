@@ -50,15 +50,6 @@ export class Service {
     return createdAt ? new Date(createdAt) : new Date();
   }
 
-  async saveDailyPost(postId: PostId, createdAt: Date): Promise<void> {
-    const key = this.keys.postData(postId);
-    await this.redis.hSet(key, {
-      postId,
-      postType: 'daily',
-      createdAt: createdAt.toISOString(),
-    });
-  }
-
   /*
    * Pinned Post
    */
@@ -68,7 +59,7 @@ export class Service {
     await this.redis.hSet(key, {
       postId,
       postType: 'pinned',
-      createdAt: createdAt.toISOString(),
+      createdAt: createdAt.toString(),
     });
   }
 
@@ -76,10 +67,50 @@ export class Service {
     const key = this.keys.postData(postId);
     const postType = await this.redis.hGet(key, 'postType');
     const createdAt = await this.redis.hGet(key, 'createdAt');
+    console.log('getting date for post ' + createdAt);
+    console.log('getting type for post ' + postType);
     return {
       postId,
       postType: postType ?? 'pinned',
-      createdAt: createdAt ?? new Date().toISOString(),
+      createdAt: createdAt ?? new Date().toString(),
+    };
+  }
+
+  /*
+   * Daily Post
+   */
+
+  async saveDailyPost(postId: PostId, createdAt: Date): Promise<void> {
+    const key = this.keys.postData(postId);
+    console.log(createdAt);
+    await this.redis.hSet(key, {
+      postId,
+      postType: 'daily',
+      createdAt: createdAt.toString(),
+    });
+  }
+
+  async getDailyPost(postId: PostId): Promise<PinnedPostData> {
+    const key = this.keys.postData(postId);
+    const postType = await this.redis.hGet(key, 'postType');
+    let createdAt = await this.redis.hGet(key, 'createdAt');
+    // if daily post was created before we started storing createdAt, get it from reddit
+    if (!createdAt) {
+      console.log('daily not found, adding it now... ' + postId);
+      const postInfo = await this.reddit?.getPostById(postId);
+      createdAt = postInfo?.createdAt.toString();
+      await this.redis.hSet(key, {
+        postId,
+        postType: postType ?? 'daily',
+        createdAt: postInfo?.createdAt.toString() ?? new Date().toString(),
+      });
+    } else {
+      console.log('found daily post ' + postId + ' ' + createdAt);
+    }
+    return {
+      postId,
+      postType: postType ?? 'daily',
+      createdAt: createdAt ?? new Date().toString(),
     };
   }
 
