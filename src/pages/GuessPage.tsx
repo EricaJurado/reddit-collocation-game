@@ -1,8 +1,6 @@
 import { Devvit, useForm, type Context } from '@devvit/public-api';
 
 import { useState } from '@devvit/public-api';
-import { GuessInput } from '../components/GuessInput.js';
-import { convertStringToDate, getPuzzleByDate } from '../../server/serverUtils.js';
 import { ButtonForm } from '../components/ButtonForm.js';
 
 interface GuessPageProps {
@@ -36,33 +34,22 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
       {wordList[0] && <text>{wordList[0]}</text>}
       {wordList.slice(1, wordList.length - 1).map((word, index) => (
         <hstack key={`${index}`} gap="medium" alignment="bottom center">
-          <ButtonForm
-            wordList={wordList}
-            index={index}
-            correctList={correct}
-            handleChange={handleGuessChange}
-          />
-          {correct[index] ? <text>Correct!</text> : <text>Incorrect!</text>}
+          {correct[index] ? (
+            <text>{wordList[index + 1]}</text>
+          ) : (
+            <>
+              <text>{word[0]}</text>
+              <ButtonForm
+                wordList={wordList}
+                index={index}
+                correctList={correct}
+                handleChange={handleGuessChange}
+              />
+            </>
+          )}
         </hstack>
       ))}
       {wordList.at(-1) != undefined && <text>{wordList.at(-1)}</text>}
-    </vstack>
-  );
-
-  return (
-    <vstack>
-      {wordList[0] && <text>{wordList[0]}</text>}
-      {wordList.slice(1, wordList.length - 1).map((word, index) => (
-        <vstack key={`${index}`}>
-          {/* <GuessInput
-            setGuessedWord={(guess) => handleGuessChange(guess, index)}
-            answer={wordList[index + 1] || ''}
-            onSubmit={() => checkWord(guessValues[index], index)}
-          /> */}
-          {correct[index] ? <text>Correct!</text> : <text>Incorrect!</text>}
-        </vstack>
-      ))}
-      {/* {wordList.at(-1) && <text>{wordList.at(-1)}</text>} */}
     </vstack>
   );
 };

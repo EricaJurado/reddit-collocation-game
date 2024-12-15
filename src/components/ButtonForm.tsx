@@ -44,8 +44,8 @@ export const ButtonForm = (props: ButtonFormProps, context: Context): JSX.Elemen
 
   return (
     <button
+      width="200px"
       onPress={() => {
-        console.log('hello!!!!');
         context.ui.showForm(form);
       }}
       disabled={correctList[index]}
