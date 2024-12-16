@@ -33,7 +33,6 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
   });
 
   const wordList = useAsync(async () => {
-    console.log('pinned getting puzzle for today', today);
     const puzzle = getPuzzleByDate(today);
     return puzzle;
   });

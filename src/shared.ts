@@ -10,8 +10,12 @@ export type PostData = {
   createdAt: string;
 };
 
+export type UserGenPostData = PostData & {
+  data: any;
+}
+
 export enum PostType {
-  USERGEN = 'usergen',
+  USERGENERATED = 'usergenerated',
   DAILY = 'daily',
   PINNED = 'pinned',
 }

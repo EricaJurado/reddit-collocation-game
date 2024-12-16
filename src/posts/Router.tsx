@@ -2,10 +2,11 @@ import type { Context } from '@devvit/public-api';
 import { Devvit, useState } from '@devvit/public-api';
 
 import { Service } from '../../server/Service.js';
-import type { PinnedPostData, PostId, PostData } from '../shared.js';
+import type { PostId, PostData, UserGenPostData } from '../shared.js';
 import { PinnedPost } from './PinnedPost.js';
 import { PostType } from '../shared.js';
 import { DailyPost } from './DailyPost.js';
+import { UserGeneratedPost } from './UserGeneratedPost.js';
 /*
  * Page Router
  *
@@ -35,19 +36,21 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     return null;
   };
 
-  function getPostData(postType: PostType, postId: PostId): Promise<PinnedPostData> {
+  function getPostData(postType: PostType, postId: PostId): Promise<PostData> {
     switch (postType) {
       case PostType.PINNED:
         return service.getPinnedPost(postId);
       case PostType.DAILY:
         return service.getDailyPost(postId);
+      case PostType.USERGENERATED:
+        return service.getUserGeneratedPost(postId);
       default:
         return service.getPinnedPost(postId);
     }
   }
 
   const [data] = useState<{
-    postData: PinnedPostData;
+    postData: PostData;
     postType: PostType;
     username: string | null;
   }>(async () => {
@@ -63,6 +66,9 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
   const postTypes: Record<string, JSX.Element> = {
     daily: <DailyPost postData={data.postData as PostData} username={data.username} />,
     pinned: <PinnedPost postData={data.postData as PostData} username={data.username} />,
+    usergenerated: (
+      <UserGeneratedPost postData={data.postData as UserGenPostData} username={data.username} />
+    ),
   };
 
   return (

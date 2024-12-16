@@ -22,9 +22,17 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
     return false;
   });
 
+  // user create their own
   const createForm = useForm(
     {
       fields: [
+        {
+          type: 'string',
+          name: 'title',
+          label: 'Title',
+          required: true,
+          placeholder: 'Enter a title',
+        },
         {
           type: 'string',
           name: 'word1',
@@ -64,8 +72,20 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
     },
     async (values) => {
       const wordList = [values.word1, values.word2, values.word3, values.word4, values.word5];
-      // Submit the created puzzle
-      console.log('submitting created puzzle', wordList);
+      // Submit the created puzzle - for right now one per user for testing
+      if (props.username) {
+        context.ui.showToast('Puzzle created!');
+        const community = await context.reddit.getCurrentSubreddit();
+        const post = await context.reddit.submitPost({
+          title: values.title,
+          subredditName: community.name,
+          preview: <text>Loading...</text>,
+        });
+
+        await service.saveUserPuzzle(props.username, wordList, post.id);
+        context.ui.showToast('Created Post');
+        context.ui.navigateTo(post);
+      }
     }
   );
 

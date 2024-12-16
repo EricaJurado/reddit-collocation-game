@@ -36,7 +36,6 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
   const [currStreak] = useState(async () => {
     if (props.username) {
       const streak = await service.getUserStreak(props.username);
-      console.log('streak', streak);
       return streak;
     } else {
       return 0;
