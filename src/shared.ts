@@ -33,3 +33,8 @@ export type UserData = {
   guessCount: number;
 };
 
+
+export type LeaderboardEntry = {
+  username: string;
+  score: number;
+}

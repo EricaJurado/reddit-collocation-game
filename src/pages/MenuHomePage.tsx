@@ -49,18 +49,6 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
           height="100%"
           padding="small"
           gap="small"
-          onPress={() => props.pageSetter('stats')}
-        >
-          <text>My Stats</text>
-        </hstack>
-      </vstack>
-      <vstack alignment="center middle" gap="small">
-        <hstack
-          alignment="center middle"
-          width="100%"
-          height="100%"
-          padding="small"
-          gap="small"
           onPress={() => props.pageSetter('leaderboard')}
         >
           <text>Leaderboard</text>

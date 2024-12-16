@@ -1,5 +1,5 @@
 import type { RedditAPIClient, RedisClient, Scheduler, ZRangeOptions } from '@devvit/public-api';
-import type { PinnedPostData, PostId, PostType } from '../src/shared.js';
+import type { LeaderboardEntry, PinnedPostData, PostId, PostType } from '../src/shared.js';
 
 export class Service {
   readonly redis: RedisClient;
@@ -240,7 +240,7 @@ export class Service {
    * @param limit - The maximum number of entries to retrieve. Defaults to 10.
    * @returns A promise that resolves to an array of leaderboard entries.
    */
-  async getDailyLeaderboard(limit = 10): Promise<{ username: string; score: number }[]> {
+  async getDailyLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
     const leaderboardKey = this.keys.dailyLeaderboard;
     const options: ZRangeOptions = { reverse: true, by: 'rank' };
     const entries = await this.redis.zRange(leaderboardKey, 0, limit - 1, options);
@@ -266,7 +266,7 @@ export class Service {
    * @param limit - The maximum number of entries to retrieve. Defaults to 10.
    * @returns A promise that resolves to an array of leaderboard entries.
    */
-  async getDailyStreakLeaderboard(limit = 10): Promise<{ username: string; score: number }[]> {
+  async getDailyStreakLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
     const leaderboardKey = this.keys.streakLeaderboard;
     const options: ZRangeOptions = { reverse: true, by: 'rank' };
 

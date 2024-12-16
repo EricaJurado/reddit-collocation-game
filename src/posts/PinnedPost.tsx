@@ -6,7 +6,7 @@ import { Service } from '../../server/Service.js';
 import { formatCreatedAtDate } from '../utils.js';
 import { MenuHomePage } from '../pages/MenuHomePage.js';
 import { WinPage } from '../pages/WinPage.js';
-import { StatsPage } from '../pages/StatsPage.js';
+import { LeaderboardPage } from '../pages/LeaderboardPage.js';
 
 interface PinnedPostProps {
   postData: PostData;
@@ -59,12 +59,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     ) : (
       <text>Error: Could not load puzzle data.</text>
     ),
-    stats: <StatsPage username={props.username} />,
-    leaderboard: (
-      <vstack>
-        <text>Leaderboard</text>
-      </vstack>
-    ),
+    leaderboard: <LeaderboardPage username={props.username} />,
     howto: (
       <vstack>
         <text>How To Play</text>

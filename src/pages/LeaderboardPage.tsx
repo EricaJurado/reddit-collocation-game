@@ -1,14 +1,14 @@
-import { Devvit, useForm, type Context } from '@devvit/public-api';
+import { Devvit, useAsync, useForm, type Context } from '@devvit/public-api';
 
 import { useState } from '@devvit/public-api';
 import { Service } from '../../server/Service.js';
+import { LeaderboardEntry } from '../shared.js';
 
-interface StatsPageProps {
+interface LeaderboardPageProps {
   username: string | null;
 }
 
-export const StatsPage = (props: StatsPageProps, context: Context): JSX.Element => {
-  // get user stats
+export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): JSX.Element => {
   const service = new Service(context);
 
   // get daily streak
@@ -49,38 +49,45 @@ export const StatsPage = (props: StatsPageProps, context: Context): JSX.Element 
   });
 
   // total daily leaderboard
-  const [dailyLeaderboard] = useState(async () => {
+  const [dailyLeaderboard] = useState<LeaderboardEntry[]>(async () => {
     const leaderboard = await service.getDailyLeaderboard();
     console.log('dailyLeaderboard', leaderboard);
-    return leaderboard;
+    return leaderboard || [];
   });
 
+  const dailyLeaderboardStack = dailyLeaderboard.map((user, index) => (
+    <hstack key={index.toString()} alignment="center middle">
+      <text>{index + 1}</text>
+      <text>{user.username}</text>
+      <text>{user.score}</text>
+    </hstack>
+  ));
+
   // streak leaderboard
-  const [streakLeaderboard] = useState(async () => {
+  const [streakLeaderboard] = useState<LeaderboardEntry[]>(async () => {
     const leaderboard = await service.getDailyStreakLeaderboard();
     console.log('streakLeaderboard', leaderboard);
-    return leaderboard;
+    return leaderboard || [];
   });
+
+  const streakLeaderboardStack = streakLeaderboard.map((user, index) => (
+    <hstack key={index.toString()} alignment="center middle">
+      <text>{index + 1}</text>
+      <text>{user.username}</text>
+      <text>{user.score}</text>
+    </hstack>
+  ));
 
   return (
     <vstack padding="medium" gap="medium">
-      <text>Stats Page</text>
+      <text>Leaderboard Page</text>
       <text key={streak.toString()}>Current Streak: {streak}</text>
       <text key={dailySolved.toString()}>Total Daily Solved: {dailySolved.toString()}</text>
       <text key={lastSolved}>Last Solved: {lastSolved}</text>
-
-      {/* {dailyLeaderboard ? (
-        <>
-          {dailyLeaderboard.map((user, index) => (
-            <hstack key={index} alignment="center middle">
-              <text>{index + 1}</text>
-              <text>{user.username}</text>
-              <text>{user.dailySolved}</text>
-            </hstack>
-          ))}
-        </>
-      ) : null} */}
+      <text>Streak Leaderboard</text>
+      {streakLeaderboardStack}
       <text>Daily Leaderboard</text>
+      {dailyLeaderboardStack}
     </vstack>
   );
 };
