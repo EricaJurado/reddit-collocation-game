@@ -219,21 +219,31 @@ export class Service {
       );
     };
 
+    // Calculate the new streak based on whether yesterday's puzzle was solved
     const newStreak = isYesterday(lastSolvedDay)
       ? await this.redis.hIncrBy(streakKey, 'streak', 1)
       : 1;
+
+    // If the new streak is 1, initialize it
     if (newStreak === 1) {
       await this.redis.hSet(streakKey, { streak: '1' });
     }
 
+    // Fetch the longest streak to compare with the new streak
     const longestStreak = parseInt((await this.redis.hGet(longestStreakKey, 'longest')) || '0', 10);
+
+    // If the new streak is longer than the current longest streak, update the longest streak
     if (newStreak > longestStreak) {
       await this.redis.hSet(longestStreakKey, { longest: newStreak.toString() });
     }
 
+    // Update the daily streak leaderboard with the new streak
     await this.updateDailyStreakLeaderboard(username, newStreak);
+
+    // Set the last solved date to today
     await this.redis.hSet(lastDailySolvedKey, { date: currentDay });
 
+    // If a subreddit exists, trigger a job for the streak update
     const subreddit = await this.reddit?.getCurrentSubreddit();
     if (subreddit?.name) {
       await this.scheduler?.runJob({
@@ -333,6 +343,22 @@ export class Service {
     const key = this.keys.userStreak(username);
     const streak = await this.redis.hGet(key, 'streak');
     return streak ? parseInt(streak, 10) : 0;
+  }
+
+  /**
+   * Retrieves the longest streak for a user.
+   * @param username - The username of the user.
+   * @returns A promise that resolves to the user's longest streak.
+   * @throws Will throw an error if the username is invalid.
+   */
+  async getUserLongestStreak(username: string): Promise<number> {
+    if (!username) {
+      throw new Error('Invalid username.');
+    }
+
+    const key = this.keys.userLongestStreak(username);
+    const longestStreak = await this.redis.hGet(key, 'longest');
+    return longestStreak ? parseInt(longestStreak, 10) : 0;
   }
 
   /**
