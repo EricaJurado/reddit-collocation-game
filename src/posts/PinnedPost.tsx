@@ -38,7 +38,11 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
 
   const saveDailySolved = async () => {
     if (props.username) {
+      // if this daily wasn't previously solved, add it to the list
       service.addDailySolvedPuzzle(props.username, todaysDate);
+
+      // update streak (based on current time and puzzle date, not when post was created)
+      service.updateUserDailySolvedStats(props.username, todaysDate);
       setPage('win');
     }
   };

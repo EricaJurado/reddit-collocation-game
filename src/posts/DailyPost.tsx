@@ -47,13 +47,7 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
   const saveDailySolved = async () => {
     if (props.username) {
       const createdAtDate = new Date(props.postData.createdAt);
-      const createdAtString =
-        createdAtDate.getMonth() +
-        1 +
-        '-' +
-        createdAtDate.getDate() +
-        '-' +
-        createdAtDate.getFullYear();
+      const createdAtString = formatCreatedAtDate(createdAtDate);
       // if this daily wasn't previously solved, add it to the list
       service.addDailySolvedPuzzle(props.username, createdAtString);
 
