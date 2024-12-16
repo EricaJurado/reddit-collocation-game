@@ -22,7 +22,8 @@ export class Service {
     userSolved: (username: string) => `user:${username}:solvedPuzzles`,
     userDailySolvedList: (username: string) => `user:${username}:dailySolvedPuzzles`,
     userDailySolvedCount: (username: string) => `user:${username}:dailySolvedCount`,
-    userStreak: (username: string) => `user:${username}:streak`,
+    userStreak: (username: string) => `user:${username}:streak`, // current daily streak
+    userLongestStreak: (username: string) => `user:${username}:longestStreak`, // longest daily streak
     userLastDailySolved: (username: string) => `user:${username}:lastDailySolved`,
     userFlair: (username: string) => `user:${username}:flair`,
     dailyLeaderboard: 'dailyLeaderboard',
@@ -160,93 +161,86 @@ export class Service {
     }
 
     const today = new Date();
-    const day = today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getFullYear();
+    const day = `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`;
     const isTodayPuzzleDay = day === puzzleDay;
 
     const dailySolvedListKey = this.keys.userDailySolvedList(username);
     const dailySolvedList = await this.redis.hGet(dailySolvedListKey, 'list');
 
-    if (!dailySolvedList?.includes(puzzleDay)) {
-      await this.addDailySolvedPuzzle(username, puzzleDay);
+    if (dailySolvedList?.includes(puzzleDay)) {
+      await this.updateLeaderboards(username);
+      return;
+    }
 
-      const dailySolvedCountKey = this.keys.userDailySolvedCount(username);
-      await this.redis.hIncrBy(dailySolvedCountKey, day, 1);
+    await this.addDailySolvedPuzzle(username, puzzleDay);
+    const dailySolvedCountKey = this.keys.userDailySolvedCount(username);
+    await this.redis.hIncrBy(dailySolvedCountKey, day, 1);
 
-      // update leaderboard
-      const dailySolvedCount = await this.getUserDailySolvedCount(username);
-      console.log('first if trying to update daily leaderboard', username, dailySolvedCount);
-      await this.updateDailyLeaderboard(username, dailySolvedCount);
+    const dailySolvedCount = await this.getUserDailySolvedCount(username);
+    await this.updateDailyLeaderboard(username, dailySolvedCount);
 
-      function isYesterday(date: Date): boolean {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        return (
-          date.getFullYear() === yesterday.getFullYear() &&
-          date.getMonth() === yesterday.getMonth() &&
-          date.getDate() === yesterday.getDate()
-        );
-      }
+    if (isTodayPuzzleDay) {
+      await this.handleStreakUpdate(username, day);
+    }
+  }
 
-      if (isTodayPuzzleDay) {
-        const lastDailySolvedKey = this.keys.userLastDailySolved(username);
-        const lastDailySolved = await this.redis.hGet(lastDailySolvedKey, 'date');
-        const lastSolvedDay = lastDailySolved ? new Date(lastDailySolved) : new Date(0);
+  /**
+   * Updates the daily and streak leaderboards.
+   * @param username - The username of the user.
+   */
+  private async updateLeaderboards(username: string): Promise<void> {
+    const dailySolvedCount = await this.getUserDailySolvedCount(username);
+    await this.updateDailyLeaderboard(username, dailySolvedCount);
 
-        const streakKey = this.keys.userStreak(username);
-        if (isYesterday(lastSolvedDay)) {
-          await this.redis.hIncrBy(streakKey, 'streak', 1);
-          const streak = await this.getUserStreak(username);
-          console.log('if trying to update daily streak leaderboard', username, streak);
-          await this.updateDailyStreakLeaderboard(username, streak);
-        } else {
-          await this.redis.hSet(streakKey, { streak: '1' });
-          console.log('if trying to update daily streak leaderboard', username, 1);
-          await this.updateDailyStreakLeaderboard(username, 1);
-        }
+    const streak = await this.getUserStreak(username);
+    await this.updateDailyStreakLeaderboard(username, streak);
+  }
 
-        await this.redis.hSet(lastDailySolvedKey, { date: day });
+  /**
+   * Handles streak updates for the user.
+   * @param username - The username of the user.
+   * @param currentDay - The current day in MM-DD-YYYY format.
+   */
+  private async handleStreakUpdate(username: string, currentDay: string): Promise<void> {
+    const lastDailySolvedKey = this.keys.userLastDailySolved(username);
+    const lastDailySolved = await this.redis.hGet(lastDailySolvedKey, 'date');
+    const lastSolvedDay = lastDailySolved ? new Date(lastDailySolved) : new Date(0);
 
-        console.log('trying...');
-        // check current streak
-        const currStreak = await this.getUserStreak(username);
-        const subreddit = await this.reddit?.getCurrentSubreddit();
+    const streakKey = this.keys.userStreak(username);
+    const longestStreakKey = this.keys.userLongestStreak(username);
 
-        console.log('current streak', currStreak);
-        console.log('subreddit', subreddit);
-        if (subreddit?.name) {
-          // used to assign user flair based on streak
-          await this.scheduler?.runJob({
-            name: 'USER_STREAK_UP',
-            data: { username, streak: currStreak, subredditName: subreddit.name },
-            runAt: new Date(),
-          });
-        }
-      }
-    } else {
-      // make sure leadboard is update even if user solved before
-      const dailySolvedCount = await this.getUserDailySolvedCount(username);
-      console.log('else trying to update daily leaderboard', username, dailySolvedCount);
-      await this.updateDailyLeaderboard(username, dailySolvedCount);
+    const isYesterday = (date: Date): boolean => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      return (
+        date.getFullYear() === yesterday.getFullYear() &&
+        date.getMonth() === yesterday.getMonth() &&
+        date.getDate() === yesterday.getDate()
+      );
+    };
 
-      const streak = await this.getUserStreak(username);
-      console.log('else trying to update daily streak leaderboard', username, streak);
-      await this.updateDailyStreakLeaderboard(username, streak);
+    const newStreak = isYesterday(lastSolvedDay)
+      ? await this.redis.hIncrBy(streakKey, 'streak', 1)
+      : 1;
+    if (newStreak === 1) {
+      await this.redis.hSet(streakKey, { streak: '1' });
+    }
 
-      console.log('...trying');
-      // check current streak
-      const currStreak = await this.getUserStreak(username);
-      const subreddit = await this.reddit?.getCurrentSubreddit();
+    const longestStreak = parseInt((await this.redis.hGet(longestStreakKey, 'longest')) || '0', 10);
+    if (newStreak > longestStreak) {
+      await this.redis.hSet(longestStreakKey, { longest: newStreak.toString() });
+    }
 
-      console.log('current streak', currStreak);
-      console.log('subreddit', subreddit);
-      if (subreddit?.name) {
-        // used to assign user flair based on streak
-        await this.scheduler?.runJob({
-          name: 'USER_STREAK_UP',
-          data: { username, streak: currStreak, subredditName: subreddit.name },
-          runAt: new Date(),
-        });
-      }
+    await this.updateDailyStreakLeaderboard(username, newStreak);
+    await this.redis.hSet(lastDailySolvedKey, { date: currentDay });
+
+    const subreddit = await this.reddit?.getCurrentSubreddit();
+    if (subreddit?.name) {
+      await this.scheduler?.runJob({
+        name: 'USER_STREAK_UP',
+        data: { username, streak: newStreak, subredditName: subreddit.name },
+        runAt: new Date(),
+      });
     }
   }
 
