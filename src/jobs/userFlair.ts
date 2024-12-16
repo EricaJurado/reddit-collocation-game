@@ -102,11 +102,11 @@ export const userStreakUpFlair = Devvit.addSchedulerJob({
           context.reddit.sendPrivateMessage({
             to: event.data.username,
             subject: `Game Streak Achievement 🏆`,
-            text: `Nice work, ${event.data.username}! You've reached a **${event.data.streak} day streak** in the Collocation Game!    
-            
-            Along with bragging rights, you've also earned an ✨exclusive user flair✨ to showcase your achievement!
-            
-            Keep up the great work! 👏`,
+            text: `Nice work, ${event.data.username}! You've reached a **${event.data.streak} day streak** in the Collocation Game!
+    
+    Along with bragging rights, you've also earned an ✨exclusive user flair✨ to showcase your achievement!
+    
+    Keep up the great work! 👏`,
           }),
           context.reddit.setUserFlair({
             subredditName: event.data.subredditName,
