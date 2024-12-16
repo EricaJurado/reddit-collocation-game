@@ -1,7 +1,4 @@
-import { Devvit, useForm, type Context } from '@devvit/public-api';
-
-import { useState } from '@devvit/public-api';
-import { ButtonForm } from '../components/ButtonForm.js';
+import { Devvit, type Context } from '@devvit/public-api';
 
 interface WinPageProps {
   winType: string;

@@ -10,17 +10,6 @@ export type PostData = {
   createdAt: string;
 };
 
-// Pinned post
-export type PinnedPostData = {
-  postId: PostId;
-  postType: string;
-  createdAt: string;
-};
-
-// TODO: daily post
-// TODO: usergen post
-
-
 export enum PostType {
   USERGEN = 'usergen',
   DAILY = 'daily',
@@ -29,8 +18,7 @@ export enum PostType {
 
 
 export type UserData = {
-  solved: boolean; // Has the user solved this post?
-  guessCount: number;
+  flairRank: number;
 };
 
 

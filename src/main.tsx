@@ -3,6 +3,7 @@ import { DEVVIT_SETTINGS_KEYS } from './constants.js';
 import { Router } from './posts/Router.js';
 import { Service } from '../server/Service.js';
 import { formatCreatedAtDate } from './utils.js';
+import './jobs/userFlair.js';
 
 Devvit.addSettings([
   // Just here as an example

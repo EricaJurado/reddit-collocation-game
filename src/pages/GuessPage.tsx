@@ -1,7 +1,7 @@
 import { Devvit, useForm, type Context } from '@devvit/public-api';
 
 import { useState } from '@devvit/public-api';
-import { ButtonForm } from '../components/ButtonForm.js';
+import { GuessForm } from '../components/GuessForm.js';
 
 interface GuessPageProps {
   wordList: string[];
@@ -42,7 +42,7 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
           ) : (
             <>
               <text>{word[0]}</text>
-              <ButtonForm
+              <GuessForm
                 wordList={wordList}
                 index={index}
                 correctList={correct}

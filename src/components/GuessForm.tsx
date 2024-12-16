@@ -1,13 +1,13 @@
 import { Context, Devvit, useForm, useState } from '@devvit/public-api';
 
-interface ButtonFormProps {
+interface GuessFormProps {
   wordList: string[];
   index: number;
   correctList: boolean[];
   handleChange: (newGuess: string, index: number) => void;
 }
 
-export const ButtonForm = (props: ButtonFormProps, context: Context): JSX.Element => {
+export const GuessForm = (props: GuessFormProps, context: Context): JSX.Element => {
   const { wordList, index, correctList, handleChange } = props;
 
   const form = useForm(

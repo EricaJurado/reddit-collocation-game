@@ -1,8 +1,7 @@
-import { Devvit, type Context } from '@devvit/public-api';
+import { Devvit, useForm, type Context } from '@devvit/public-api';
 import { useState } from '@devvit/public-api';
 import type { PostData } from '../shared.js';
 import { Service } from '../../server/Service.js';
-import { DailyPost } from '../posts/DailyPost.js';
 import { formatCreatedAtDate } from '../utils.js';
 
 interface MenuProps {
@@ -13,18 +12,62 @@ interface MenuProps {
 
 export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element => {
   const service = new Service(context);
-
   const targetDate = formatCreatedAtDate(new Date(props.postData.createdAt));
 
   const [isDailySolved] = useState(async () => {
     if (props.username) {
       const puzzleList = await service.getDailySolvedPuzzles(props.username);
-      const isDailyInSolvedList = puzzleList.includes(targetDate) ? true : false;
-      return isDailyInSolvedList;
-    } else {
-      return false;
+      return puzzleList.includes(targetDate);
     }
+    return false;
   });
+
+  const createForm = useForm(
+    {
+      fields: [
+        {
+          type: 'string',
+          name: 'word1',
+          label: 'Word 1',
+          required: true,
+          placeholder: 'Enter a word',
+        },
+        {
+          type: 'string',
+          name: 'word2',
+          label: 'Word 2',
+          required: true,
+          placeholder: 'Enter a word',
+        },
+        {
+          type: 'string',
+          name: 'word3',
+          label: 'Word 3',
+          required: true,
+          placeholder: 'Enter a word',
+        },
+        {
+          type: 'string',
+          name: 'word4',
+          label: 'Word 4',
+          required: true,
+          placeholder: 'Enter a word',
+        },
+        {
+          type: 'string',
+          name: 'word5',
+          label: 'Word 5',
+          required: true,
+          placeholder: 'Enter a word',
+        },
+      ],
+    },
+    async (values) => {
+      const wordList = [values.word1, values.word2, values.word3, values.word4, values.word5];
+      // Submit the created puzzle
+      console.log('submitting created puzzle', wordList);
+    }
+  );
 
   return (
     <vstack width="100%" height="100%" alignment="center middle">
@@ -52,6 +95,18 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
           onPress={() => props.pageSetter('leaderboard')}
         >
           <text>Leaderboard</text>
+        </hstack>
+      </vstack>
+      <vstack alignment="center middle" gap="small">
+        <hstack
+          alignment="center middle"
+          width="100%"
+          height="100%"
+          padding="small"
+          gap="small"
+          onPress={() => context.ui.showForm(createForm)} // Show the form on click
+        >
+          <text>Create Your Own Puzzle</text>
         </hstack>
       </vstack>
       <vstack alignment="center middle" gap="small">
