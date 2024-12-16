@@ -38,8 +38,11 @@ export class Service {
     /** Key for storing last daily solved date (needed for streak) */
     userLastDailySolved: (username: string) => `user:${username}:lastDailySolved`,
 
-    /** Key for storing leaderboard stats. */
-    leaderboard: 'leaderboard',
+    /** Key for storing leaderboard for total daily */
+    dailyLeaderboard: 'dailyLeaderboard',
+
+    /** Key for storing leaderboard for daily streak */
+    streakLeaderboard: 'streakLeaderboard',
   };
 
   /*
@@ -51,12 +54,6 @@ export class Service {
     const postType = await this.redis.hGet(key, 'postType');
     const defaultPostType = 'daily';
     return (postType ?? defaultPostType) as PostType;
-  }
-
-  async getPostCreatedAt(postId: PostId): Promise<Date> {
-    const key = this.keys.postData(postId);
-    const createdAt = await this.redis.hGet(key, 'createdAt');
-    return createdAt ? new Date(createdAt) : new Date();
   }
 
   /*
@@ -115,41 +112,6 @@ export class Service {
       postType: postType ?? 'daily',
       createdAt: createdAt ?? new Date().toString(),
     };
-  }
-
-  /**
-   * Add a puzzle to the list of puzzles created by a user.
-   */
-  async addCreatedPuzzle(username: string, puzzleId: string): Promise<void> {
-    if (!username || !puzzleId) {
-      throw new Error('Invalid username or puzzleId.');
-    }
-
-    const key = this.keys.userPuzzles(username);
-    const currentData = await this.redis.hGet(key, 'list');
-    const puzzles = currentData ? JSON.parse(currentData) : [];
-    puzzles.push(puzzleId);
-    await this.redis.hSet(key, { list: JSON.stringify(puzzles) });
-  }
-
-  /**
-   * Add a puzzle to the list of puzzles solved by a user and update their stats.
-   */
-  async addSolvedPuzzle(username: string, puzzleId: string): Promise<void> {
-    if (!username || !puzzleId) {
-      throw new Error('Invalid username or puzzleId.');
-    }
-
-    const key = this.keys.userSolved(username);
-    const currentData = await this.redis.hGet(key, 'list');
-    const puzzles = currentData ? JSON.parse(currentData) : [];
-    if (!puzzles.includes(puzzleId)) {
-      puzzles.push(puzzleId);
-      await this.redis.hSet(key, { list: JSON.stringify(puzzles) });
-
-      // Update leaderboard and streak
-      await this.incrementUserStats(username);
-    }
   }
 
   /**
@@ -236,44 +198,6 @@ export class Service {
   }
 
   /**
-   * Increment the stats for a user (e.g., total puzzles solved).
-   */
-  async incrementUserStats(username: string): Promise<void> {
-    if (!username) {
-      throw new Error('Invalid username.');
-    }
-
-    const leaderboardKey = this.keys.leaderboard;
-    await this.redis.hIncrBy(leaderboardKey, username, 1);
-  }
-
-  /**
-   * Get the list of puzzles created by a user.
-   */
-  async getCreatedPuzzles(username: string): Promise<string[]> {
-    if (!username) {
-      throw new Error('Invalid username.');
-    }
-
-    const key = this.keys.userPuzzles(username);
-    const currentData = await this.redis.hGet(key, 'list');
-    return currentData ? JSON.parse(currentData) : [];
-  }
-
-  /**
-   * Get the list of puzzles solved by a user.
-   */
-  async getSolvedPuzzles(username: string): Promise<string[]> {
-    if (!username) {
-      throw new Error('Invalid username.');
-    }
-
-    const key = this.keys.userSolved(username);
-    const currentData = await this.redis.hGet(key, 'list');
-    return currentData ? JSON.parse(currentData) : [];
-  }
-
-  /**
    * Get the list of daily puzzles solved by a user.
    */
   async getDailySolvedPuzzles(username: string): Promise<string[]> {
@@ -289,14 +213,52 @@ export class Service {
   /**
    * Get the leaderboard for top solvers.
    */
-  async getLeaderboard(limit = 10): Promise<{ username: string; score: number }[]> {
-    const leaderboardKey = this.keys.leaderboard;
-    const data = await this.redis.hGetAll(leaderboardKey);
-    const leaderboard = Object.entries(data).map(([username, score]) => ({
-      username,
-      score: parseInt(score, 10),
+  /**
+   * Get the leaderboard for top solvers.
+   */
+  async getDailyLeaderboard(limit = 10): Promise<{ username: string; score: number }[]> {
+    const leaderboardKey = this.keys.dailyLeaderboard;
+
+    // Fetch the top `limit` users and their scores
+
+    const entries = await this.redis.zRange(leaderboardKey, 0, -1, { by: 'score' });
+    const reversedEntries = entries.reverse();
+    console.log('leaderboard entries', reversedEntries);
+
+    // Map the results to an array of objects
+    return reversedEntries.map((entry) => ({
+      username: entry.member,
+      score: entry.score,
     }));
-    return leaderboard.sort((a, b) => b.score - a.score).slice(0, limit);
+  }
+
+  async updateDailyLeaderboard(username: string, score: number): Promise<void> {
+    const leaderboardKey = this.keys.dailyLeaderboard;
+    await this.redis.zAdd(leaderboardKey, { member: username, score });
+  }
+
+  /**
+   * Get the leaderboard for top streaks.
+   */
+  async getStreakLeaderboard(limit = 10): Promise<{ username: string; score: number }[]> {
+    const leaderboardKey = this.keys.streakLeaderboard;
+
+    // Fetch the top `limit` users and their scores
+
+    const entries = await this.redis.zRange(leaderboardKey, 0, -1, { by: 'score' });
+    const reversedEntries = entries.reverse();
+    console.log('leaderboard entries', reversedEntries);
+
+    // Map the results to an array of objects
+    return reversedEntries.map((entry) => ({
+      username: entry.member,
+      score: entry.score,
+    }));
+  }
+
+  async updateStreakLeaderboard(username: string, score: number): Promise<void> {
+    const leaderboardKey = this.keys.streakLeaderboard;
+    await this.redis.zAdd(leaderboardKey, { member: username, score });
   }
 
   /**
@@ -313,15 +275,14 @@ export class Service {
     return streak ? parseInt(streak, 10) : 0;
   }
 
-  getUserDailySolvedCount(username: string): Promise<number> {
+  async getUserDailySolvedCount(username: string): Promise<number> {
     if (!username) {
       throw new Error('Invalid username.');
     }
 
     const key = this.keys.userDailySolvedCount(username);
-    return this.redis.hGetAll(key).then((data) => {
-      return Object.values(data).reduce((acc, val) => acc + parseInt(val, 10), 0);
-    });
+    const data = await this.redis.hGetAll(key);
+    return Object.values(data).reduce((acc, val) => acc + parseInt(val, 10), 0);
   }
 
   async getUserLastSolved(username: string): Promise<string> {
