@@ -175,48 +175,15 @@ export class Service {
       throw new Error('Invalid username or day.');
     }
 
-    function isYesterday(date: Date): boolean {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      return (
-        date.getFullYear() === yesterday.getFullYear() &&
-        date.getMonth() === yesterday.getMonth() &&
-        date.getDate() === yesterday.getDate()
-      );
-    }
-
     // is today this daily puzzle's day? we only want to update stats when user does the daily puzzle for today
     const today = new Date();
     const day = today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getFullYear();
     const isTodayPuzzleDay = day === puzzleDay;
 
-    if (isTodayPuzzleDay) {
-      // if today is puzzle day, let's update the streak
-      const lastDailySolvedKey = this.keys.userLastDailySolved(username);
-      const lastDailySolved = await this.redis.hGet(lastDailySolvedKey, 'date');
-
-      // if last solved day, covert to Date object, if not make sure last solved is way in the past
-      const lastSolvedDay = lastDailySolved ? new Date(lastDailySolved) : new Date(0);
-
-      const streakKey = this.keys.userStreak(username);
-      if (isYesterday(lastSolvedDay)) {
-        // if the last solved day is yesterday, increment streak
-        await this.redis.hIncrBy(streakKey, 'streak', 1);
-        console.log('incremented streak - yesterday puzzle was solved');
-      } else {
-        // if the last solved day is not yesterday, reset streak
-        await this.redis.hSet(streakKey, { streak: '1' });
-        console.log('reset streak - yesterday puzzle was not solved');
-      }
-
-      // update last solved day
-      await this.redis.hSet(lastDailySolvedKey, { date: day });
-      console.log('updated last solved day to', day);
-    }
-
     const dailySolvedListKey = this.keys.userDailySolvedList(username);
     const dailySolvedList = await this.redis.hGet(dailySolvedListKey, 'list');
+
+    console.log('daily solved list', dailySolvedList);
 
     if (!dailySolvedList?.includes(puzzleDay)) {
       console.log('day not in daily solved list');
@@ -227,6 +194,44 @@ export class Service {
       const dailySolvedCountKey = this.keys.userDailySolvedCount(username);
       await this.redis.hIncrBy(dailySolvedCountKey, day, 1);
       console.log('incremented daily solved count for', day);
+
+      function isYesterday(date: Date): boolean {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        return (
+          date.getFullYear() === yesterday.getFullYear() &&
+          date.getMonth() === yesterday.getMonth() &&
+          date.getDate() === yesterday.getDate()
+        );
+      }
+
+      if (isTodayPuzzleDay) {
+        // if today is puzzle day, let's update the streak
+        const lastDailySolvedKey = this.keys.userLastDailySolved(username);
+        const lastDailySolved = await this.redis.hGet(lastDailySolvedKey, 'date');
+        console.log('last solved day', lastDailySolved);
+
+        // if last solved day, covert to Date object, if not make sure last solved is way in the past
+        const lastSolvedDay = lastDailySolved ? new Date(lastDailySolved) : new Date(0);
+
+        const streakKey = this.keys.userStreak(username);
+        if (isYesterday(lastSolvedDay)) {
+          // if the last solved day is yesterday, increment streak
+          await this.redis.hIncrBy(streakKey, 'streak', 1);
+          console.log('incremented streak - yesterday puzzle was solved');
+        } else {
+          // if the last solved day is not yesterday, reset streak
+          await this.redis.hSet(streakKey, { streak: '1' });
+          console.log('reset streak - yesterday puzzle was not solved');
+        }
+
+        // update last solved day
+        await this.redis.hSet(lastDailySolvedKey, { date: day });
+        console.log('updated last solved day to', day);
+      }
+    } else {
+      console.log('day already in daily solved list');
     }
   }
 
@@ -306,5 +311,26 @@ export class Service {
     const streak = await this.redis.hGet(key, 'streak');
     console.log(streak);
     return streak ? parseInt(streak, 10) : 0;
+  }
+
+  getUserDailySolvedCount(username: string): Promise<number> {
+    if (!username) {
+      throw new Error('Invalid username.');
+    }
+
+    const key = this.keys.userDailySolvedCount(username);
+    return this.redis.hGetAll(key).then((data) => {
+      return Object.values(data).reduce((acc, val) => acc + parseInt(val, 10), 0);
+    });
+  }
+
+  async getUserLastSolved(username: string): Promise<string> {
+    if (!username) {
+      throw new Error('Invalid username.');
+    }
+
+    const key = this.keys.userLastDailySolved(username);
+    const lastSolved = await this.redis.hGet(key, 'date');
+    return lastSolved ?? '';
   }
 }
