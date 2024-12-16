@@ -48,12 +48,39 @@ export const StatsPage = (props: StatsPageProps, context: Context): JSX.Element 
     }
   });
 
+  // total daily leaderboard
+  const [dailyLeaderboard] = useState(async () => {
+    const leaderboard = await service.getDailyLeaderboard();
+    console.log('dailyLeaderboard', leaderboard);
+    return leaderboard;
+  });
+
+  // streak leaderboard
+  const [streakLeaderboard] = useState(async () => {
+    const leaderboard = await service.getDailyStreakLeaderboard();
+    console.log('streakLeaderboard', leaderboard);
+    return leaderboard;
+  });
+
   return (
     <vstack padding="medium" gap="medium">
       <text>Stats Page</text>
       <text key={streak.toString()}>Current Streak: {streak}</text>
       <text key={dailySolved.toString()}>Total Daily Solved: {dailySolved.toString()}</text>
       <text key={lastSolved}>Last Solved: {lastSolved}</text>
+
+      {/* {dailyLeaderboard ? (
+        <>
+          {dailyLeaderboard.map((user, index) => (
+            <hstack key={index} alignment="center middle">
+              <text>{index + 1}</text>
+              <text>{user.username}</text>
+              <text>{user.dailySolved}</text>
+            </hstack>
+          ))}
+        </>
+      ) : null} */}
+      <text>Daily Leaderboard</text>
     </vstack>
   );
 };
