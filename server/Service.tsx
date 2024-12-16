@@ -27,7 +27,16 @@ export class Service {
     userSolved: (username: string) => `user:${username}:solvedPuzzles`,
 
     /** Key for storing the list of puzzles solved by a specific user on a daily basis. */
-    userDailySolved: (username: string) => `user:${username}:dailySolvedPuzzles`,
+    userDailySolvedList: (username: string) => `user:${username}:dailySolvedPuzzles`,
+
+    /** Key for storing total daily solved */
+    userDailySolvedCount: (username: string) => `user:${username}:dailySolvedCount`,
+
+    /** Key for storing daily streak length */
+    userStreak: (username: string) => `user:${username}:streak`,
+
+    /** Key for storing last daily solved date (needed for streak) */
+    userLastDailySolved: (username: string) => `user:${username}:lastDailySolved`,
 
     /** Key for storing leaderboard stats. */
     leaderboard: 'leaderboard',
@@ -146,17 +155,78 @@ export class Service {
   /**
    * Add a daily solved puzzle to the list of puzzles solved by a user.
    */
-  async addDailySolvedPuzzle(username: string, day: string): Promise<void> {
-    if (!username || !day) {
+  async addDailySolvedPuzzle(username: string, puzzleDay: string): Promise<void> {
+    if (!username || !puzzleDay) {
       throw new Error('Invalid username or day.');
     }
 
-    const key = this.keys.userDailySolved(username);
+    const key = this.keys.userDailySolvedList(username);
     const currentData = await this.redis.hGet(key, 'list');
     const solvedDays = currentData ? JSON.parse(currentData) : [];
-    if (!solvedDays.includes(day)) {
-      solvedDays.push(day);
+    if (!solvedDays.includes(puzzleDay)) {
+      solvedDays.push(puzzleDay);
       await this.redis.hSet(key, { list: JSON.stringify(solvedDays) });
+    }
+  }
+
+  // increase total daily solved count and update streak
+  async updateUserDailySolvedStats(username: string, puzzleDay: string): Promise<void> {
+    if (!username || !puzzleDay) {
+      throw new Error('Invalid username or day.');
+    }
+
+    function isYesterday(date: Date): boolean {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      return (
+        date.getFullYear() === yesterday.getFullYear() &&
+        date.getMonth() === yesterday.getMonth() &&
+        date.getDate() === yesterday.getDate()
+      );
+    }
+
+    // is today this daily puzzle's day? we only want to update stats when user does the daily puzzle for today
+    const today = new Date();
+    const day = today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getFullYear();
+    const isTodayPuzzleDay = day === puzzleDay;
+
+    if (isTodayPuzzleDay) {
+      // if today is puzzle day, let's update the streak
+      const lastDailySolvedKey = this.keys.userLastDailySolved(username);
+      const lastDailySolved = await this.redis.hGet(lastDailySolvedKey, 'date');
+
+      // if last solved day, covert to Date object, if not make sure last solved is way in the past
+      const lastSolvedDay = lastDailySolved ? new Date(lastDailySolved) : new Date(0);
+
+      const streakKey = this.keys.userStreak(username);
+      if (isYesterday(lastSolvedDay)) {
+        // if the last solved day is yesterday, increment streak
+        await this.redis.hIncrBy(streakKey, 'streak', 1);
+        console.log('incremented streak - yesterday puzzle was solved');
+      } else {
+        // if the last solved day is not yesterday, reset streak
+        await this.redis.hSet(streakKey, { streak: '1' });
+        console.log('reset streak - yesterday puzzle was not solved');
+      }
+
+      // update last solved day
+      await this.redis.hSet(lastDailySolvedKey, { date: day });
+      console.log('updated last solved day to', day);
+    }
+
+    const dailySolvedListKey = this.keys.userDailySolvedList(username);
+    const dailySolvedList = await this.redis.hGet(dailySolvedListKey, 'list');
+
+    if (!dailySolvedList?.includes(puzzleDay)) {
+      console.log('day not in daily solved list');
+      // if today wasn't previously solved, add it to the list
+      await this.addDailySolvedPuzzle(username, puzzleDay);
+
+      // increment total daily solved count
+      const dailySolvedCountKey = this.keys.userDailySolvedCount(username);
+      await this.redis.hIncrBy(dailySolvedCountKey, day, 1);
+      console.log('incremented daily solved count for', day);
     }
   }
 
@@ -206,7 +276,7 @@ export class Service {
       throw new Error('Invalid username.');
     }
 
-    const key = this.keys.userDailySolved(username);
+    const key = this.keys.userDailySolvedList(username);
     const currentData = await this.redis.hGet(key, 'list');
     return currentData ? JSON.parse(currentData) : [];
   }
@@ -232,33 +302,9 @@ export class Service {
       throw new Error('Invalid username.');
     }
 
-    const solvedPuzzles = await this.getSolvedPuzzles(username);
-    // Parse dates from puzzle IDs (dd-mm-yyyy format)
-    const solvedDates = solvedPuzzles
-      .map((id) => {
-        const [day, month, year] = id.split('-').map(Number);
-        return new Date(year, month - 1, day); // Convert to Date object
-      })
-      .filter((date) => !isNaN(date.getTime())) // Filter out invalid dates
-      .sort((a, b) => b.getTime() - a.getTime()); // Sort descending by date
-
-    let streak = 0;
-    let currentDate = new Date();
-
-    for (const date of solvedDates) {
-      // Check if the date matches today or yesterday in the streak
-      if (
-        date.toDateString() === currentDate.toDateString() ||
-        date.toDateString() ===
-          new Date(currentDate.setDate(currentDate.getDate() - 1)).toDateString()
-      ) {
-        streak++;
-        currentDate = new Date(currentDate.setDate(currentDate.getDate() - 1)); // Move to previous day
-      } else {
-        break;
-      }
-    }
-
-    return streak;
+    const key = this.keys.userStreak(username);
+    const streak = await this.redis.hGet(key, 'streak');
+    console.log(streak);
+    return streak ? parseInt(streak, 10) : 0;
   }
 }

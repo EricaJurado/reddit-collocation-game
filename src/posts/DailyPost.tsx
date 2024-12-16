@@ -33,18 +33,33 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
     }
   });
 
+  const [currStreak] = useState(async () => {
+    if (props.username) {
+      const streak = await service.getUserStreak(props.username);
+      console.log('streak', streak);
+      return streak;
+    } else {
+      return 0;
+    }
+  });
+
   // day solved should be one that is solved for the day the post was created
   const saveDailySolved = async () => {
     if (props.username) {
       const createdAtDate = new Date(props.postData.createdAt);
-      const targetDate =
+      const createdAtString =
         createdAtDate.getMonth() +
         1 +
         '-' +
         createdAtDate.getDate() +
         '-' +
         createdAtDate.getFullYear();
-      service.addDailySolvedPuzzle(props.username, targetDate);
+      // if this daily wasn't previously solved, add it to the list
+      service.addDailySolvedPuzzle(props.username, createdAtString);
+
+      // update streak (based on current time and puzzle date, not when post was created)
+      service.updateUserDailySolvedStats(props.username, targetDate);
+
       setPage('menu');
     }
   };
@@ -64,6 +79,7 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
     <vstack key={page}>
       {isDailySolved && <text>Daily ✅</text>}
       {targetDate && <text>{targetDate}</text>}
+      {currStreak && <text>Current Streak: {currStreak}</text>}
       <text>Current page: {page}</text> {/* Log the page state */}
       {pages[page]}
     </vstack>
