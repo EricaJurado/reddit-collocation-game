@@ -15,7 +15,20 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
     wordList.map((word, index) => (index === 0 || index === wordList.length - 1 ? word : ''))
   );
   // initialize hints with first letter of each word
-  const [hints, setHints] = useState<string[]>(wordList.map((word) => word[0]));
+  const [hints, setHints] = useState<string[]>(
+    wordList.map((word, index) => {
+      if (index === 0 || index === wordList.length - 1) {
+        // if first or last word in series, no need for hint - puzzle should show these at start
+        return word;
+      } else if (index === 1 || index === wordList.length - 2) {
+        return word[0];
+        // if second or second to last word in series, show first letter as hint so player can solve from either end
+      } else {
+        // if middle word, no hint
+        return '';
+      }
+    })
+  );
 
   // initialize correct with all false except for first and last word - set those to true
   const [correct, setCorrect] = useState<boolean[]>(
@@ -23,7 +36,7 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
   );
 
   const checkWord = (word: string, index: number): boolean => {
-    const isCorrect = word === wordList[index];
+    const isCorrect = word.toUpperCase() === wordList[index].toUpperCase();
     const newCorrect = [...correct];
     newCorrect[index] = isCorrect;
     setCorrect(newCorrect);
@@ -46,9 +59,7 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
       // give user another letter in the word they got wrong
       const newHints = [...hints];
       const currHintLength = newHints[index + 1].length;
-      console.log(currHintLength);
       newHints[index + 1] = wordList[index + 1].slice(0, currHintLength + 1);
-      console.log(newHints);
       setHints(newHints);
     } else {
       context.ui.showToast('Correct guess');
@@ -64,16 +75,12 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
             <text size="xlarge">{wordList[index + 1].toUpperCase()}</text>
           ) : (
             <>
-              <text size="xlarge" key={hints.toString()}>
-                {hints[index + 1].toUpperCase()}
-              </text>
               <GuessForm
                 wordList={wordList}
                 index={index}
                 correctList={correct}
                 handleChange={handleGuessChange}
-                // is disabled unless previous or next word is correct
-                isDisabled={!(correct[index] || correct[index + 2])}
+                hints={hints}
               />
             </>
           )}
