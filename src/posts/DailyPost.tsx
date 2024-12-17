@@ -71,11 +71,18 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
   };
 
   return (
-    <vstack key={page}>
-      {/* {isDailySolved && <text>Daily ✅</text>}
+    <vstack key={page} height="100%" width="100%">
+      <zstack height="100%" width="100%">
+        <hstack alignment="top end" width="100%">
+          <button onPress={() => setPage('menu')}>Back</button>
+        </hstack>
+        {/* {isDailySolved && <text>Daily ✅</text>}
       {targetDate && <text>{targetDate}</text>}
       {currStreak && <text>Current Streak: {currStreak}</text>} */}
-      {pages[page]}
+        <hstack alignment="middle center" height="100%" width="100%">
+          {pages[page]}
+        </hstack>
+      </zstack>
     </vstack>
   );
 };
