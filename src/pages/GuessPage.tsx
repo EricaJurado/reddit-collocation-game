@@ -62,6 +62,15 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
       newHints[index + 1] = wordList[index + 1].slice(0, currHintLength + 1);
       setHints(newHints);
     } else {
+      // give user a hint for previous or next word (whichever hint is currenty empty)
+      const newHints = [...hints];
+      if (newHints[index] === '') {
+        newHints[index] = wordList[index][0];
+      } else {
+        newHints[index + 2] = wordList[index + 2][0];
+      }
+      setHints(newHints);
+
       context.ui.showToast('Correct guess');
     }
   };
