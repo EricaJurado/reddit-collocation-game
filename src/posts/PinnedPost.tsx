@@ -7,6 +7,7 @@ import { formatCreatedAtDate } from '../utils.js';
 import { MenuHomePage } from '../pages/MenuHomePage.js';
 import { WinPage } from '../pages/WinPage.js';
 import { LeaderboardPage } from '../pages/LeaderboardPage.js';
+import { HowToPage } from '../pages/HowToPage.js';
 
 interface PinnedPostProps {
   postData: PostData;
@@ -57,19 +58,18 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
   const pages: Record<string, JSX.Element> = {
     menu: <MenuHomePage username={props.username} postData={props.postData} pageSetter={setPage} />,
     win: <WinPage onNext={() => setPage('menu')} />,
-    daily: !wordList ? (
-      <text>Loading...</text>
-    ) : Array.isArray(wordList.data) ? (
-      <GuessPage wordList={wordList.data} solvedSetter={saveDailySolved} />
-    ) : (
-      <text>Error: Could not load puzzle data.</text>
+    daily: (
+      <zstack height="100%" width="100%">
+        <vstack height="100%" width="100%" alignment="center middle">
+          <GuessPage wordList={wordList.data || []} solvedSetter={saveDailySolved} />
+        </vstack>
+        <vstack alignment="bottom start" width="100%" height="100%">
+          <text>{isDailySolved ? 'Solved!' : ''}</text>
+        </vstack>
+      </zstack>
     ),
     leaderboard: <LeaderboardPage username={props.username} />,
-    howto: (
-      <vstack>
-        <text>How To Play</text>
-      </vstack>
-    ),
+    howto: <HowToPage />,
   };
 
   return (

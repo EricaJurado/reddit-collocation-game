@@ -21,9 +21,10 @@ export class PuzzleService extends ServiceBase {
     const puzzleId = `${username}-${Date.now()}`; // Unique identifier for the puzzle
     const puzzleEntry = {
       id: puzzleId,
-      data: JSON.stringify(puzzleData),
+      puzzle: JSON.stringify(puzzleData),
       postId: postId as string,
       postType: 'usergenerated',
+      creator: username,
       createdAt: new Date().toISOString(),
     };
 

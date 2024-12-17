@@ -6,6 +6,7 @@ import { Service } from '../../server/Service.js';
 import { formatCreatedAtDate } from '../utils.js';
 import { MenuHomePage } from '../pages/MenuHomePage.js';
 import { WinPage } from '../pages/WinPage.js';
+import { HowToPage } from '../pages/HowToPage.js';
 
 interface DailyPostProps {
   postData: PostData;
@@ -15,7 +16,7 @@ interface DailyPostProps {
 // posted every day, puzzle should default to the puzzle for the date the post was created
 export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element => {
   const service = new Service(context);
-  const [page, setPage] = useState('puzzle');
+  const [page, setPage] = useState('daily');
   const wordList = useAsync(async () => {
     const createdAtDate = new Date(props.postData.createdAt);
     const puzzle = getPuzzleByDate(createdAtDate);
@@ -46,8 +47,6 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
   // day solved should be one that is solved for the day the post was created
   const saveDailySolved = async () => {
     setPage('win');
-
-    console.log('save daily from daily post');
     if (props.username) {
       const createdAtDate = new Date(props.postData.createdAt);
       const createdAtString = formatCreatedAtDate(createdAtDate);
@@ -59,15 +58,19 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
   };
 
   const pages: Record<string, JSX.Element> = {
-    puzzle: !wordList ? (
-      <text>Loading...</text>
-    ) : Array.isArray(wordList.data) ? (
-      <GuessPage wordList={wordList.data} solvedSetter={saveDailySolved} />
-    ) : (
-      <text>Error: Could not load puzzle data.</text>
+    daily: (
+      <zstack height="100%" width="100%">
+        <vstack height="100%" width="100%" alignment="center middle">
+          <GuessPage wordList={wordList.data || []} solvedSetter={saveDailySolved} />
+        </vstack>
+        <vstack alignment="bottom start" width="100%" height="100%">
+          <text>{isDailySolved ? 'Solved!' : ''}</text>
+        </vstack>
+      </zstack>
     ),
     win: <WinPage onNext={() => setPage('menu')} />,
     menu: <MenuHomePage username={props.username} postData={props.postData} pageSetter={setPage} />,
+    howto: <HowToPage />,
   };
 
   return (

@@ -11,7 +11,8 @@ export type PostData = {
 };
 
 export type UserGenPostData = PostData & {
-  data: any;
+  puzzle: string[];
+  creator: UserId;
 }
 
 export enum PostType {

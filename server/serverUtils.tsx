@@ -17,7 +17,11 @@ function convertStringToDate(date: string): Date {
 function getPuzzleByDate(date: Date): string[] | null {
   const data: JsonData = puzzles;
   const targetDate = date.getMonth() + 1 + '-' + date.getDate() + '-' + date.getFullYear();
-  const dailyPuzzle = data?.[targetDate];
+  let dailyPuzzle = data?.[targetDate];
+  if (!dailyPuzzle) {
+    const safeDate = '12-1-2024';
+    dailyPuzzle = data?.[safeDate];
+  }
   return dailyPuzzle;
 }
 

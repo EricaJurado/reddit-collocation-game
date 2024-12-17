@@ -120,7 +120,6 @@ export class UserService extends ServiceBase {
 
     const key = this.keys.userCreatedPuzzleList(username);
     const currentData = await this.redis.hGet(key, 'list');
-    console.log('currentData:', currentData);
     return currentData ? JSON.parse(currentData) : [];
   }
 
@@ -208,7 +207,6 @@ export class UserService extends ServiceBase {
     const newStreak = isYesterday(lastSolvedDay)
       ? await this.redis.hIncrBy(streakKey, 'streak', 1)
       : 1;
-    console.log('new streak:', newStreak);
 
     // If the new streak is 1, initialize it
     if (newStreak === 1) {
@@ -217,7 +215,6 @@ export class UserService extends ServiceBase {
 
     // Fetch the longest streak to compare with the new streak
     const longestStreak = parseInt((await this.redis.hGet(longestStreakKey, 'longest')) || '0', 10);
-    console.log('longest streak:', longestStreak);
     // If the new streak is longer than the current longest streak, update the longest streak
     if (newStreak > longestStreak) {
       await this.redis.hSet(longestStreakKey, { longest: newStreak.toString() });
