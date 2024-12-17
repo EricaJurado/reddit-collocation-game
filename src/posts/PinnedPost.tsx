@@ -72,5 +72,18 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     ),
   };
 
-  return <vstack key={page}>{pages[page]}</vstack>;
+  return (
+    <vstack key={page} height="100%" width="100%">
+      <zstack height="100%" width="100%">
+        {page !== 'menu' && (
+          <hstack alignment="top end" width="100%">
+            <button onPress={() => setPage('menu')}>Menu</button>
+          </hstack>
+        )}
+        <hstack alignment="middle center" height="100%" width="100%">
+          {pages[page]}
+        </hstack>
+      </zstack>
+    </vstack>
+  );
 };

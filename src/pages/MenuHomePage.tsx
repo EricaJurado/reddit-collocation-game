@@ -96,7 +96,7 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
     <vstack width="100%" height="100%" alignment="center middle">
       {/* Menu */}
 
-      <vstack height="100%">
+      <vstack height="100%" alignment="center middle" gap="small">
         <image imageHeight={84} imageWidth={676} url="logo-transparent.gif" />
         <vstack alignment="center middle" gap="small">
           <hstack
