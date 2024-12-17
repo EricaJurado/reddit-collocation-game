@@ -37,7 +37,7 @@ Devvit.addSchedulerJob({
       text: 'This is a daily thread, comment here!',
     });
     const service = new Service(context);
-    await service.saveDailyPost(resp.id, resp.createdAt);
+    await service.postService.saveDailyPost(resp.id, resp.createdAt);
   },
 });
 
@@ -79,7 +79,7 @@ Devvit.addMenuItem({
     });
     ui.showToast({ text: 'Created post!' });
     await post.sticky();
-    await service.savePinnedPost(post.id, post.createdAt);
+    await service.postService.savePinnedPost(post.id, post.createdAt);
     ui.navigateTo(post.url);
   },
 });
@@ -105,7 +105,7 @@ Devvit.addMenuItem({
     });
     ui.showToast({ text: 'Created post!' });
     const service = new Service(context);
-    await service.saveDailyPost(post.id, post.createdAt);
+    await service.postService.saveDailyPost(post.id, post.createdAt);
     ui.navigateTo(post.url);
   },
 });
