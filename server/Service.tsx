@@ -26,15 +26,17 @@ export class Service {
     postData: (postId: PostId) => `post:${postId}`,
     userPuzzles: (username: string) => `user:${username}:puzzles`,
     puzzlePostMap: () => `puzzle:post:map`,
-    userSolved: (username: string) => `user:${username}:solvedPuzzles`,
+    userUserGeneratedSolved: (username: string) => `user:${username}:solvedUGPuzzles`,
+    userUserGeneratedSolvedCount: (username: string) => `user:${username}:solvedUGCount`,
     userDailySolvedList: (username: string) => `user:${username}:dailySolvedPuzzles`,
     userDailySolvedCount: (username: string) => `user:${username}:dailySolvedCount`,
     userStreak: (username: string) => `user:${username}:streak`, // current daily streak
     userLongestStreak: (username: string) => `user:${username}:longestStreak`, // longest daily streak
     userLastDailySolved: (username: string) => `user:${username}:lastDailySolved`,
     userFlair: (username: string) => `user:${username}:flair`,
-    dailyLeaderboard: 'dailyLeaderboard',
-    streakLeaderboard: 'streakLeaderboard',
+    dailyTotalLeaderboard: 'dailyTotalLeaderboard',
+    dailyStreakLeaderboard: 'dailyStreakLeaderboard',
+    userGenSolvedLeaderboard: 'userGenSolvedLeaderboard',
     gameSettings: 'game-settings',
   };
 
@@ -132,6 +134,41 @@ export class Service {
   }
 
   /*
+   * User Generated Puzzles Solved
+   */
+  async addUserGeneratedSolvedPuzzle(username: string, puzzleId: string): Promise<void> {
+    if (!username || !puzzleId) {
+      throw new Error('Invalid username or puzzle ID.');
+    }
+
+    const key = this.keys.userUserGeneratedSolved(username);
+    const currentData = await this.redis.hGet(key, 'list');
+    const solvedPuzzles = currentData ? JSON.parse(currentData) : [];
+    if (!solvedPuzzles.includes(puzzleId)) {
+      solvedPuzzles.push(puzzleId);
+      await this.redis.hSet(key, { list: JSON.stringify(solvedPuzzles) });
+    }
+  }
+
+  async getUserGeneratedSolvedPuzzleList(username: string): Promise<string[]> {
+    if (!username) {
+      throw new Error('Invalid username.');
+    }
+
+    const key = this.keys.userUserGeneratedSolved(username);
+    const currentData = await this.redis.hGet(key, 'list');
+    return currentData ? JSON.parse(currentData) : [];
+  }
+
+  async getUserGeneratedPuzzleSolvedCount(username: string): Promise<number> {
+    // get length of user generated solved list
+    const key = this.keys.userUserGeneratedSolved(username);
+    const currentData = await this.redis.hGet(key, 'list');
+    const solvedPuzzles = currentData ? JSON.parse(currentData) : [];
+    return solvedPuzzles.length;
+  }
+
+  /*
    * User Daily Solved Puzzles
    */
   /**
@@ -175,16 +212,9 @@ export class Service {
     const dailySolvedList = await this.redis.hGet(dailySolvedListKey, 'list');
 
     if (dailySolvedList?.includes(puzzleDay)) {
-      await this.updateLeaderboards(username);
+      await this.updateAllDailyLeaderboards(username);
       return;
     }
-
-    await this.addDailySolvedPuzzle(username, puzzleDay);
-    const dailySolvedCountKey = this.keys.userDailySolvedCount(username);
-    await this.redis.hIncrBy(dailySolvedCountKey, day, 1);
-
-    const dailySolvedCount = await this.getUserDailySolvedCount(username);
-    await this.updateDailyLeaderboard(username, dailySolvedCount);
 
     if (isTodayPuzzleDay) {
       await this.handleStreakUpdate(username, day);
@@ -195,12 +225,10 @@ export class Service {
    * Updates the daily and streak leaderboards.
    * @param username - The username of the user.
    */
-  private async updateLeaderboards(username: string): Promise<void> {
-    const dailySolvedCount = await this.getUserDailySolvedCount(username);
-    await this.updateDailyLeaderboard(username, dailySolvedCount);
+  private async updateAllDailyLeaderboards(username: string): Promise<void> {
+    await this.updateDailyLeaderboard(username);
 
-    const streak = await this.getUserStreak(username);
-    await this.updateDailyStreakLeaderboard(username, streak);
+    await this.updateDailyStreakLeaderboard(username);
   }
 
   /**
@@ -245,7 +273,7 @@ export class Service {
     }
 
     // Update the daily streak leaderboard with the new streak
-    await this.updateDailyStreakLeaderboard(username, newStreak);
+    await this.updateDailyStreakLeaderboard(username);
 
     // Set the last solved date to today
     await this.redis.hSet(lastDailySolvedKey, { date: currentDay });
@@ -286,7 +314,7 @@ export class Service {
    * @returns A promise that resolves to an array of leaderboard entries.
    */
   async getDailyLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
-    const leaderboardKey = this.keys.dailyLeaderboard;
+    const leaderboardKey = this.keys.dailyTotalLeaderboard;
     const options: ZRangeOptions = { reverse: true, by: 'rank' };
     const entries = await this.redis.zRange(leaderboardKey, 0, limit - 1, options);
     return entries.map((entry) => ({
@@ -301,9 +329,12 @@ export class Service {
    * @param score - The score to update.
    * @returns A promise that resolves when the leaderboard is updated.
    */
-  async updateDailyLeaderboard(username: string, score: number): Promise<void> {
-    const leaderboardKey = this.keys.dailyLeaderboard;
-    await this.redis.zAdd(leaderboardKey, { member: username, score });
+  async updateDailyLeaderboard(username: string): Promise<void> {
+    const dailySolvedListKey = this.keys.userDailySolvedList(username);
+    const dailySolvedList = await this.redis.hGet(dailySolvedListKey, 'list');
+    const dailySolvedCount = dailySolvedList ? JSON.parse(dailySolvedList).length + 1 : 1;
+    const leaderboardKey = this.keys.dailyTotalLeaderboard;
+    await this.redis.zAdd(leaderboardKey, { member: username, score: dailySolvedCount });
   }
 
   /**
@@ -312,7 +343,7 @@ export class Service {
    * @returns A promise that resolves to an array of leaderboard entries.
    */
   async getDailyStreakLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
-    const leaderboardKey = this.keys.streakLeaderboard;
+    const leaderboardKey = this.keys.dailyStreakLeaderboard;
     const options: ZRangeOptions = { reverse: true, by: 'rank' };
 
     const entries = await this.redis.zRange(leaderboardKey, 0, limit - 1, options);
@@ -328,9 +359,10 @@ export class Service {
    * @param score - The score to update.
    * @returns A promise that resolves when the leaderboard is updated.
    */
-  async updateDailyStreakLeaderboard(username: string, score: number): Promise<void> {
-    const leaderboardKey = this.keys.streakLeaderboard;
-    await this.redis.zAdd(leaderboardKey, { member: username, score });
+  async updateDailyStreakLeaderboard(username: string): Promise<void> {
+    const streak = await this.getUserStreak(username);
+    const leaderboardKey = this.keys.dailyStreakLeaderboard;
+    await this.redis.zAdd(leaderboardKey, { member: username, score: streak });
   }
 
   /*
