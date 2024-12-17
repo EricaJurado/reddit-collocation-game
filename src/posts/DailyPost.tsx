@@ -7,6 +7,7 @@ import { formatCreatedAtDate } from '../utils.js';
 import { MenuHomePage } from '../pages/MenuHomePage.js';
 import { WinPage } from '../pages/WinPage.js';
 import { HowToPage } from '../pages/HowToPage.js';
+import { LeaderboardPage } from '../pages/LeaderboardPage.js';
 
 interface DailyPostProps {
   postData: PostData;
@@ -72,6 +73,7 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
     ) : (
       <text>Error: Could not load puzzle data.</text>
     ),
+    leaderboard: <LeaderboardPage username={props.username} />,
     win: <WinPage onNext={() => setPage('menu')} />,
     menu: <MenuHomePage username={props.username} postData={props.postData} pageSetter={setPage} />,
     howto: <HowToPage />,
