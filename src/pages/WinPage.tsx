@@ -1,7 +1,6 @@
 import { Devvit, type Context } from '@devvit/public-api';
 
 interface WinPageProps {
-  winType: string;
   onNext: () => void;
 }
 

@@ -5,6 +5,7 @@ import { getPuzzleByDate } from '../../server/serverUtils.js';
 import { Service } from '../../server/Service.js';
 import { formatCreatedAtDate } from '../utils.js';
 import { MenuHomePage } from '../pages/MenuHomePage.js';
+import { WinPage } from '../pages/WinPage.js';
 
 interface DailyPostProps {
   postData: PostData;
@@ -52,9 +53,8 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
 
       // update streak (based on current time and puzzle date, not when post was created)
       service.updateUserDailySolvedStats(props.username, targetDate);
-
-      setPage('menu');
     }
+    setPage('win');
   };
 
   const pages: Record<string, JSX.Element> = {
@@ -65,15 +65,15 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
     ) : (
       <text>Error: Could not load puzzle data.</text>
     ),
+    win: <WinPage onNext={() => setPage('menu')} />,
     menu: <MenuHomePage username={props.username} postData={props.postData} pageSetter={setPage} />,
   };
 
   return (
     <vstack key={page}>
-      {isDailySolved && <text>Daily ✅</text>}
+      {/* {isDailySolved && <text>Daily ✅</text>}
       {targetDate && <text>{targetDate}</text>}
-      {currStreak && <text>Current Streak: {currStreak}</text>}
-      <text>Current page: {page}</text> {/* Log the page state */}
+      {currStreak && <text>Current Streak: {currStreak}</text>} */}
       {pages[page]}
     </vstack>
   );

@@ -3,6 +3,7 @@ import { GuessPage } from '../pages/GuessPage.js';
 import type { UserGenPostData } from '../shared.js';
 import { Service } from '../../server/Service.js';
 import { MenuHomePage } from '../pages/MenuHomePage.js';
+import { WinPage } from '../pages/WinPage.js';
 
 interface UserGeneratedPostProps {
   postData: UserGenPostData;
@@ -40,8 +41,8 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
       const puzzleId = props.postData.postId;
       // add the solved puzzle to the user's list of solved puzzles
       // await service.addDailySolvedPuzzle(props.username, puzzleId); // Assuming shared logic
-      setPage('menu');
     }
+    setPage('win');
   };
 
   const pages: Record<string, JSX.Element> = {
@@ -52,15 +53,9 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
     ) : (
       <text>Error: Could not load puzzle data.</text>
     ),
+    win: <WinPage onNext={() => setPage('menu')} />,
     menu: <MenuHomePage username={props.username} postData={props.postData} pageSetter={setPage} />,
   };
 
-  return (
-    <vstack key={page}>
-      {isPuzzleSolved && <text>Puzzle Solved ✅</text>}
-      <text>Created At: {createdAtString}</text>
-      <text>Current Page: {page}</text>
-      {pages[page]}
-    </vstack>
-  );
+  return <vstack key={page}>{pages[page]}</vstack>;
 };

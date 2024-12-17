@@ -44,13 +44,13 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
 
       // update streak (based on current time and puzzle date, not when post was created)
       service.updateUserDailySolvedStats(props.username, todaysDate);
-      setPage('win');
     }
+    setPage('win');
   };
 
   const pages: Record<string, JSX.Element> = {
     menu: <MenuHomePage username={props.username} postData={props.postData} pageSetter={setPage} />,
-    win: <WinPage winType={isDailySolved ? 'daily' : 'weekly'} onNext={() => setPage('menu')} />,
+    win: <WinPage onNext={() => setPage('menu')} />,
     daily: !wordList ? (
       <text>Loading...</text>
     ) : Array.isArray(wordList.data) ? (
@@ -66,10 +66,5 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     ),
   };
 
-  return (
-    <vstack key={page}>
-      <text>Current page: {page}</text> {/* Log the page state */}
-      {pages[page]}
-    </vstack>
-  );
+  return <vstack key={page}>{pages[page]}</vstack>;
 };
