@@ -17,7 +17,9 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
 
   // Fetch the puzzle data from `props.postData`
   const puzzleData = useAsync(async () => {
-    const postDataFromService = await service.getUserGeneratedPost(props.postData.postId);
+    const postDataFromService = await service.postService.getUserGeneratedPost(
+      props.postData.postId
+    );
     return postDataFromService.data;
   });
 
@@ -37,10 +39,8 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
 
   const savePuzzleSolved = async () => {
     if (props.username) {
-      console.log(' puzzle solved should be saved');
       const puzzleId = props.postData.postId;
-      // add the solved puzzle to the user's list of solved puzzles
-      // await service.addDailySolvedPuzzle(props.username, puzzleId); // Assuming shared logic
+      service.userService.addUserGeneratedSolvedPuzzle(props.username, puzzleId);
     }
     setPage('win');
   };

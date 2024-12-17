@@ -39,13 +39,13 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
   function getPostData(postType: PostType, postId: PostId): Promise<PostData> {
     switch (postType) {
       case PostType.PINNED:
-        return service.getPinnedPost(postId);
+        return service.postService.getPinnedPost(postId);
       case PostType.DAILY:
-        return service.getDailyPost(postId);
+        return service.postService.getDailyPost(postId);
       case PostType.USERGENERATED:
-        return service.getUserGeneratedPost(postId);
+        return service.postService.getUserGeneratedPost(postId);
       default:
-        return service.getPinnedPost(postId);
+        return service.postService.getPinnedPost(postId);
     }
   }
 
@@ -54,7 +54,10 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     postType: PostType;
     username: string | null;
   }>(async () => {
-    const [postType, username] = await Promise.all([service.getPostType(postId), getUsername()]);
+    const [postType, username] = await Promise.all([
+      service.postService.getPostType(postId),
+      getUsername(),
+    ]);
     const [postData] = await Promise.all([getPostData(postType, postId)]);
     return {
       postData,

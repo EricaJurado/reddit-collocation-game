@@ -26,7 +26,7 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
 
   const [isDailySolved] = useState(async () => {
     if (props.username) {
-      const puzzleList = await service.getDailySolvedPuzzles(props.username);
+      const puzzleList = await service.userService.getDailySolvedPuzzles(props.username);
       const isDailyInSolvedList = puzzleList.includes(targetDate) ? true : false;
       return isDailyInSolvedList;
     } else {
@@ -36,7 +36,7 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
 
   const [currStreak] = useState(async () => {
     if (props.username) {
-      const streak = await service.getUserStreak(props.username);
+      const streak = await service.userService.getUserStreak(props.username);
       return streak;
     } else {
       return 0;
@@ -45,16 +45,18 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
 
   // day solved should be one that is solved for the day the post was created
   const saveDailySolved = async () => {
+    setPage('win');
+
+    console.log('save daily from daily post');
     if (props.username) {
       const createdAtDate = new Date(props.postData.createdAt);
       const createdAtString = formatCreatedAtDate(createdAtDate);
       // if this daily wasn't previously solved, add it to the list
-      service.addDailySolvedPuzzle(props.username, createdAtString);
-
+      await service.userService.addDailySolvedPuzzle(props.username, createdAtString);
+      console.log('added daily solved puzzle');
       // update streak (based on current time and puzzle date, not when post was created)
-      service.updateUserDailySolvedStats(props.username, targetDate);
+      service.userService.updateUserDailySolvedStats(props.username, targetDate);
     }
-    setPage('win');
   };
 
   const pages: Record<string, JSX.Element> = {

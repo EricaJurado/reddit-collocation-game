@@ -16,7 +16,7 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
 
   const [isDailySolved] = useState(async () => {
     if (props.username) {
-      const puzzleList = await service.getDailySolvedPuzzles(props.username);
+      const puzzleList = await service.userService.getDailySolvedPuzzles(props.username);
       return puzzleList.includes(targetDate);
     }
     return false;
@@ -81,8 +81,7 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
           subredditName: community.name,
           preview: <text>Loading...</text>,
         });
-
-        await service.saveUserPuzzle(props.username, wordList, post.id);
+        await service.puzzleService.saveUserPuzzle(props.username, wordList, post.id);
         context.ui.showToast('Created Post');
         context.ui.navigateTo(post);
       }

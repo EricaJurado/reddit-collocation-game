@@ -24,7 +24,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
 
   const [isDailySolved] = useState(async () => {
     if (props.username) {
-      const puzzleList = await service.getDailySolvedPuzzles(props.username);
+      const puzzleList = await service.userService.getDailySolvedPuzzles(props.username);
       const isDailyInSolvedList = puzzleList.includes(todaysDate) ? true : false;
       return isDailyInSolvedList;
     } else {
@@ -40,10 +40,16 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
   const saveDailySolved = async () => {
     if (props.username) {
       // if this daily wasn't previously solved, add it to the list
-      service.addDailySolvedPuzzle(props.username, todaysDate);
+      service.userService.addDailySolvedPuzzle(props.username, todaysDate);
 
       // update streak (based on current time and puzzle date, not when post was created)
-      service.updateUserDailySolvedStats(props.username, todaysDate);
+      const solvedDailies = await service.userService.getDailySolvedPuzzles(props.username);
+
+      if (solvedDailies.includes(todaysDate)) {
+        await service.leaderboardService.updateAllDailyLeaderboards(props.username);
+        return;
+      }
+      service.userService.updateUserDailySolvedStats(props.username, todaysDate);
     }
     setPage('win');
   };

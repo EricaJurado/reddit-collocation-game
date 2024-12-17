@@ -52,9 +52,9 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
     const newGuessValues = [...guessValues];
     newGuessValues[index + 1] = newGuess;
     console.log(newGuessValues);
-    const correct = checkWord(newGuess, index + 1);
+    const currCorrect = checkWord(newGuess, index + 1);
 
-    if (!correct) {
+    if (!currCorrect) {
       context.ui.showToast('Incorrect guess');
       // give user another letter in the word they got wrong
       const newHints = [...hints];

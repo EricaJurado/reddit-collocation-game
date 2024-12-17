@@ -5,7 +5,6 @@ import { LeaderboardEntry } from '../shared.js';
 
 interface LeaderboardPageProps {
   username: string | null;
-  score: number;
 }
 
 export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): JSX.Element => {
@@ -13,19 +12,23 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
 
   // State hooks
   const [streak] = useState(async () =>
-    props.username ? await service.getUserStreak(props.username) : 0
+    props.username ? await service.userService.getUserStreak(props.username) : 0
   );
   const [dailySolved] = useState(async () =>
-    props.username ? await service.getUserDailySolvedCount(props.username) : 0
+    props.username ? await service.userService.getUserDailySolvedCount(props.username) : 0
   );
   const [lastSolved] = useState(async () =>
-    props.username ? (await service.getUserLastSolved(props.username)) || '' : ''
+    props.username ? (await service.userService.getUserLastSolved(props.username)) || '' : ''
   );
   const [dailyLeaderboard] = useState<LeaderboardEntry[]>(
-    async () => (await service.getDailyLeaderboard()) || []
+    async () => (await service.leaderboardService.getDailyLeaderboard()) || []
   );
   const [streakLeaderboard] = useState<LeaderboardEntry[]>(
-    async () => (await service.getDailyStreakLeaderboard()) || []
+    async () => (await service.leaderboardService.getDailyStreakLeaderboard()) || []
+  );
+
+  const [totalUserGenSolved] = useState(async () =>
+    props.username ? await service.userService.getUserGeneratedPuzzleSolvedCount(props.username) : 0
   );
 
   // Utility function to create a vertical column of leaderboard data
@@ -81,6 +84,11 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
         {createColumn(dailyLeaderboard, 'username', 'User', 'middle center', 'top center')}
         {createColumn(dailyLeaderboard, 'score', 'Streak', 'top center', 'middle start')}
       </hstack>
+
+      {/* User Generated Solved Puzzles */}
+      <text size="medium" weight="bold">
+        User Generated Solved Puzzles
+      </text>
     </vstack>
   );
 };
