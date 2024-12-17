@@ -59,8 +59,7 @@ Devvit.addTrigger({
 });
 
 Devvit.addMenuItem({
-  // Please update as you work on your idea!
-  label: 'Create Pinned Post',
+  label: 'Add Pinned Game Post',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
@@ -68,8 +67,7 @@ Devvit.addMenuItem({
     const service = new Service(context);
     const subreddit = await reddit.getCurrentSubreddit();
     const post = await reddit.submitPost({
-      // Title of the post. You'll want to update!
-      title: 'Collocation Game',
+      title: "Let's play PhraseMe!",
       subredditName: subreddit.name,
       preview: (
         <vstack>
@@ -85,30 +83,30 @@ Devvit.addMenuItem({
 });
 
 // for testing daily - currently daily should be auto scheduled on app install
-Devvit.addMenuItem({
-  label: 'Daily Post',
-  location: 'subreddit',
-  forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const { reddit, ui } = context;
-    const subreddit = await reddit.getCurrentSubreddit();
-    const now = new Date();
-    const formattedNow = formatCreatedAtDate(now);
-    const post = await reddit.submitPost({
-      title: `Daily Puzzle ${formattedNow}`,
-      subredditName: subreddit.name,
-      preview: (
-        <vstack>
-          <text>Loading...</text>
-        </vstack>
-      ),
-    });
-    ui.showToast({ text: 'Created post!' });
-    const service = new Service(context);
-    await service.postService.saveDailyPost(post.id, post.createdAt);
-    ui.navigateTo(post.url);
-  },
-});
+// Devvit.addMenuItem({
+//   label: 'Daily Post',
+//   location: 'subreddit',
+//   forUserType: 'moderator',
+//   onPress: async (_event, context) => {
+//     const { reddit, ui } = context;
+//     const subreddit = await reddit.getCurrentSubreddit();
+//     const now = new Date();
+//     const formattedNow = formatCreatedAtDate(now);
+//     const post = await reddit.submitPost({
+//       title: `Daily Puzzle ${formattedNow}`,
+//       subredditName: subreddit.name,
+//       preview: (
+//         <vstack>
+//           <text>Loading...</text>
+//         </vstack>
+//       ),
+//     });
+//     ui.showToast({ text: 'Created post!' });
+//     const service = new Service(context);
+//     await service.postService.saveDailyPost(post.id, post.createdAt);
+//     ui.navigateTo(post.url);
+//   },
+// });
 
 // Add a post type definition
 Devvit.addCustomPostType({

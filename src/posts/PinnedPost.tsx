@@ -38,6 +38,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
   });
 
   const saveDailySolved = async () => {
+    setPage('win');
     if (props.username) {
       // if this daily wasn't previously solved, add it to the list
       service.userService.addDailySolvedPuzzle(props.username, todaysDate);
@@ -49,9 +50,8 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
         await service.leaderboardService.updateAllDailyLeaderboards(props.username);
         return;
       }
-      service.userService.updateUserDailySolvedStats(props.username, todaysDate);
+      await service.userService.updateUserDailySolvedStats(props.username, todaysDate);
     }
-    setPage('win');
   };
 
   const pages: Record<string, JSX.Element> = {

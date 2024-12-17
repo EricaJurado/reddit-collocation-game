@@ -4,6 +4,7 @@ import type { UserGenPostData } from '../shared.js';
 import { Service } from '../../server/Service.js';
 import { MenuHomePage } from '../pages/MenuHomePage.js';
 import { WinPage } from '../pages/WinPage.js';
+import { LeaderboardPage } from '../pages/LeaderboardPage.js';
 
 interface UserGeneratedPostProps {
   postData: UserGenPostData;
@@ -38,11 +39,16 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
   });
 
   const savePuzzleSolved = async () => {
+    setPage('win');
     if (props.username) {
       const puzzleId = props.postData.postId;
-      service.userService.addUserGeneratedSolvedPuzzle(props.username, puzzleId);
+      await service.userService.addUserGeneratedSolvedPuzzle(props.username, puzzleId);
+      const allSolved = await service.userService.getUserGeneratedSolvedPuzzleList(props.username);
+      console.log(allSolved);
+
+      // update leaderboard
+      await service.leaderboardService.updateUserGenSolvedLeaderboard(props.username);
     }
-    setPage('win');
   };
 
   const pages: Record<string, JSX.Element> = {
@@ -55,6 +61,7 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
     ),
     win: <WinPage onNext={() => setPage('menu')} />,
     menu: <MenuHomePage username={props.username} postData={props.postData} pageSetter={setPage} />,
+    leaderboard: <LeaderboardPage username={props.username} />,
   };
 
   return <vstack key={page}>{pages[page]}</vstack>;

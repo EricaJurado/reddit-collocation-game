@@ -44,9 +44,10 @@ export class UserService extends ServiceBase {
       throw new Error('Invalid username.');
     }
 
-    const key = this.keys.userDailySolvedCount(username);
-    const data = await this.redis.hGetAll(key);
-    return Object.values(data).reduce((acc, val) => acc + parseInt(val, 10), 0);
+    const key = this.keys.userDailySolvedList(username);
+    const currentData = await this.redis.hGet(key, 'list');
+    const solvedPuzzles = currentData ? JSON.parse(currentData) : [];
+    return solvedPuzzles.length;
   }
 
   /**
@@ -97,6 +98,43 @@ export class UserService extends ServiceBase {
     return solvedPuzzles.length;
   }
 
+  // create
+  async addUserCreatedPuzzle(username: string, puzzleId: string): Promise<void> {
+    if (!username || !puzzleId) {
+      throw new Error('Invalid username or puzzle ID.');
+    }
+
+    const key = this.keys.userCreatedPuzzleList(username);
+    const currentData = await this.redis.hGet(key, 'list');
+    const createdPuzzles = currentData ? JSON.parse(currentData) : [];
+    if (!createdPuzzles.includes(puzzleId)) {
+      createdPuzzles.push(puzzleId);
+      await this.redis.hSet(key, { list: JSON.stringify(createdPuzzles) });
+    }
+  }
+
+  async getUserCreatedPuzzleList(username: string): Promise<string[]> {
+    if (!username) {
+      throw new Error('Invalid username.');
+    }
+
+    const key = this.keys.userCreatedPuzzleList(username);
+    const currentData = await this.redis.hGet(key, 'list');
+    console.log('currentData:', currentData);
+    return currentData ? JSON.parse(currentData) : [];
+  }
+
+  async getUserCreatedPuzzleCount(username: string): Promise<number> {
+    if (!username) {
+      throw new Error('Invalid username.');
+    }
+
+    const key = this.keys.userCreatedPuzzleList(username);
+    const currentData = await this.redis.hGet(key, 'list');
+    const createdPuzzles = currentData ? JSON.parse(currentData) : [];
+    return createdPuzzles.length;
+  }
+
   /*
    * User Daily Solved Puzzles
    */
@@ -118,6 +156,7 @@ export class UserService extends ServiceBase {
     if (!solvedDays.includes(puzzleDay)) {
       solvedDays.push(puzzleDay);
       await this.redis.hSet(key, { list: JSON.stringify(solvedDays) });
+      await this.redis.hIncrBy(this.keys.userDailySolvedCount(username), puzzleDay, 1);
     }
   }
 
@@ -136,14 +175,6 @@ export class UserService extends ServiceBase {
     const today = new Date();
     const day = `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`;
     const isTodayPuzzleDay = day === puzzleDay;
-
-    // const dailySolvedListKey = this.keys.userDailySolvedList(username);
-    // const dailySolvedList = await this.redis.hGet(dailySolvedListKey, 'list');
-
-    // if (dailySolvedList?.includes(puzzleDay)) {
-    //   await this.leaderboardService.updateAllDailyLeaderboards(username);
-    //   return;
-    // }
 
     if (isTodayPuzzleDay) {
       await this.handleStreakUpdate(username, day);
@@ -177,6 +208,7 @@ export class UserService extends ServiceBase {
     const newStreak = isYesterday(lastSolvedDay)
       ? await this.redis.hIncrBy(streakKey, 'streak', 1)
       : 1;
+    console.log('new streak:', newStreak);
 
     // If the new streak is 1, initialize it
     if (newStreak === 1) {
@@ -185,7 +217,7 @@ export class UserService extends ServiceBase {
 
     // Fetch the longest streak to compare with the new streak
     const longestStreak = parseInt((await this.redis.hGet(longestStreakKey, 'longest')) || '0', 10);
-
+    console.log('longest streak:', longestStreak);
     // If the new streak is longer than the current longest streak, update the longest streak
     if (newStreak > longestStreak) {
       await this.redis.hSet(longestStreakKey, { longest: newStreak.toString() });
@@ -220,4 +252,6 @@ export class UserService extends ServiceBase {
     const currentData = await this.redis.hGet(key, 'list');
     return currentData ? JSON.parse(currentData) : [];
   }
+
+  // each time the user makes a new puzzle, increment the count
 }

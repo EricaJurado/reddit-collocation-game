@@ -51,7 +51,7 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
   const handleGuessChange = (newGuess: string, index: number) => {
     const newGuessValues = [...guessValues];
     newGuessValues[index + 1] = newGuess;
-    console.log(newGuessValues);
+    setGuessValues(newGuessValues);
     const currCorrect = checkWord(newGuess, index + 1);
 
     if (!currCorrect) {

@@ -51,11 +51,10 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
     if (props.username) {
       const createdAtDate = new Date(props.postData.createdAt);
       const createdAtString = formatCreatedAtDate(createdAtDate);
-      // if this daily wasn't previously solved, add it to the list
       await service.userService.addDailySolvedPuzzle(props.username, createdAtString);
-      console.log('added daily solved puzzle');
       // update streak (based on current time and puzzle date, not when post was created)
-      service.userService.updateUserDailySolvedStats(props.username, targetDate);
+      await service.userService.updateUserDailySolvedStats(props.username, targetDate);
+      await service.leaderboardService.updateAllDailyLeaderboards(props.username);
     }
   };
 

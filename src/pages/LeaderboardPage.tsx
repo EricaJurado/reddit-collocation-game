@@ -20,6 +20,14 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
   const [lastSolved] = useState(async () =>
     props.username ? (await service.userService.getUserLastSolved(props.username)) || '' : ''
   );
+  const [userGenSolved] = useState(async () =>
+    props.username ? await service.userService.getUserGeneratedPuzzleSolvedCount(props.username) : 0
+  );
+
+  const [userCreated] = useState(async () =>
+    props.username ? await service.userService.getUserCreatedPuzzleCount(props.username) : 0
+  );
+
   const [dailyLeaderboard] = useState<LeaderboardEntry[]>(
     async () => (await service.leaderboardService.getDailyLeaderboard()) || []
   );
@@ -27,8 +35,12 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
     async () => (await service.leaderboardService.getDailyStreakLeaderboard()) || []
   );
 
-  const [totalUserGenSolved] = useState(async () =>
-    props.username ? await service.userService.getUserGeneratedPuzzleSolvedCount(props.username) : 0
+  const [userGenSolvedLeaderboard] = useState<LeaderboardEntry[]>(
+    async () => (await service.leaderboardService.getUserGenSolvedLeaderboard()) || []
+  );
+
+  const [userCreatedLeaderboard] = useState<LeaderboardEntry[]>(
+    async () => (await service.leaderboardService.getUserCreatedPuzzleLeaderboard()) || []
   );
 
   // Utility function to create a vertical column of leaderboard data
@@ -86,9 +98,22 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
       </hstack>
 
       {/* User Generated Solved Puzzles */}
-      <text size="medium" weight="bold">
+      {/* <text size="medium" weight="bold">
         User Generated Solved Puzzles
       </text>
+      <hstack alignment="top start" gap="large">
+        {createColumn(userGenSolvedLeaderboard, 'username', 'User', 'middle center', 'top center')}
+        {createColumn(userGenSolvedLeaderboard, 'score', 'Solved', 'top center', 'middle start')}
+      </hstack> */}
+
+      {/* User Created Puzzles */}
+      <text size="medium" weight="bold">
+        User Created Puzzles
+      </text>
+      <hstack alignment="top start" gap="large">
+        {createColumn(userCreatedLeaderboard, 'username', 'User', 'middle center', 'top center')}
+        {createColumn(userCreatedLeaderboard, 'score', 'Created', 'top center', 'middle start')}
+      </hstack>
     </vstack>
   );
 };

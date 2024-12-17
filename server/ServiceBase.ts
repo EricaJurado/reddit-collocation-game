@@ -21,8 +21,9 @@ export abstract class ServiceBase {
     postData: (postId: PostId) => `post:${postId}`,
     userPuzzles: (username: string) => `user:${username}:puzzles`,
     puzzlePostMap: () => `puzzle:post:map`,
+        userCreatedPuzzleList: (username: string) => `user:${username}:userGeneratedPuzzles`,
+
     userUserGeneratedSolved: (username: string) => `user:${username}:solvedUGPuzzles`,
-    userUserGeneratedSolvedCount: (username: string) => `user:${username}:solvedUGCount`,
     userDailySolvedList: (username: string) => `user:${username}:dailySolvedPuzzles`,
     userDailySolvedCount: (username: string) => `user:${username}:dailySolvedCount`,
     userStreak: (username: string) => `user:${username}:streak`, // current daily streak
@@ -32,7 +33,10 @@ export abstract class ServiceBase {
     dailyTotalLeaderboard: 'dailyTotalLeaderboard',
     dailyStreakLeaderboard: 'dailyStreakLeaderboard',
     userGenSolvedLeaderboard: 'userGenSolvedLeaderboard',
+        userCreatedPuzzleLeaderboard: 'userCreatedPuzzleLeaderboard',
+
     gameSettings: 'game-settings',
+
   };
 
   /**

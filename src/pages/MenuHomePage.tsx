@@ -29,8 +29,7 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
         {
           type: 'string',
           name: 'title',
-          label: 'Title',
-          required: true,
+          label: 'Title (default is FIRST WORD → LAST WORD)',
           placeholder: 'Enter a title',
         },
         {
@@ -73,15 +72,20 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
     async (values) => {
       const wordList = [values.word1, values.word2, values.word3, values.word4, values.word5];
       // Submit the created puzzle - for right now one per user for testing
+      const postTitle =
+        values.title || `${values.word1.toUpperCase()} → ${values.word5.toUpperCase()}`;
       if (props.username) {
         context.ui.showToast('Puzzle created!');
         const community = await context.reddit.getCurrentSubreddit();
         const post = await context.reddit.submitPost({
-          title: values.title,
+          title: postTitle,
           subredditName: community.name,
           preview: <text>Loading...</text>,
         });
         await service.puzzleService.saveUserPuzzle(props.username, wordList, post.id);
+        // update user's created puzzles
+        await service.userService.addUserCreatedPuzzle(props.username, post.id);
+        await service.leaderboardService.updateUserCreatedPuzzleLeaderboard(props.username);
         context.ui.showToast('Created Post');
         context.ui.navigateTo(post);
       }
