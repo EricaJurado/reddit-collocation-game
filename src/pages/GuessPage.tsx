@@ -10,11 +10,20 @@ interface GuessPageProps {
 
 export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element => {
   const [wordList] = useState<string[]>(props.wordList);
-  const [guessValues, setGuessValues] = useState<string[]>([]);
-  const [correct, setCorrect] = useState<boolean[]>(new Array(wordList.length - 2).fill(false));
+  // initialize guessValues with empty string for each word except first and last word - set those to the word
+  const [guessValues, setGuessValues] = useState<string[]>(
+    wordList.map((word, index) => (index === 0 || index === wordList.length - 1 ? word : ''))
+  );
+  // initialize hints with first letter of each word
+  const [hints, setHints] = useState<string[]>(wordList.map((word) => word[0]));
 
-  const checkWord = (word: string, index: number) => {
-    const isCorrect = word === wordList[index + 1];
+  // initialize correct with all false except for first and last word - set those to true
+  const [correct, setCorrect] = useState<boolean[]>(
+    wordList.map((word, index) => (index === 0 || index === wordList.length - 1 ? true : false))
+  );
+
+  const checkWord = (word: string, index: number): boolean => {
+    const isCorrect = word === wordList[index];
     const newCorrect = [...correct];
     newCorrect[index] = isCorrect;
     setCorrect(newCorrect);
@@ -23,36 +32,54 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
     if (newCorrect.every((value) => value === true)) {
       props.solvedSetter();
     }
+    return isCorrect;
   };
 
   const handleGuessChange = (newGuess: string, index: number) => {
     const newGuessValues = [...guessValues];
-    newGuessValues[index] = newGuess;
-    setGuessValues(newGuessValues);
-    checkWord(newGuess, index);
+    newGuessValues[index + 1] = newGuess;
+    console.log(newGuessValues);
+    const correct = checkWord(newGuess, index + 1);
+
+    if (!correct) {
+      context.ui.showToast('Incorrect guess');
+      // give user another letter in the word they got wrong
+      const newHints = [...hints];
+      const currHintLength = newHints[index + 1].length;
+      console.log(currHintLength);
+      newHints[index + 1] = wordList[index + 1].slice(0, currHintLength + 1);
+      console.log(newHints);
+      setHints(newHints);
+    } else {
+      context.ui.showToast('Correct guess');
+    }
   };
 
   return (
-    <vstack padding="medium" gap="medium">
-      {wordList[0] && <text>{wordList[0]}</text>}
+    <vstack padding="medium" gap="medium" alignment="start middle">
+      {wordList[0] && <text size="xlarge">{wordList[0].toUpperCase()}</text>}
       {wordList.slice(1, wordList.length - 1).map((word, index) => (
-        <hstack key={`${index}`} gap="medium" alignment="bottom center">
-          {correct[index] ? (
-            <text>{wordList[index + 1]}</text>
+        <hstack key={`${index}`} gap="medium">
+          {correct[index + 1] ? (
+            <text size="xlarge">{wordList[index + 1].toUpperCase()}</text>
           ) : (
             <>
-              <text>{word[0]}</text>
+              <text size="xlarge" key={hints.toString()}>
+                {hints[index + 1].toUpperCase()}
+              </text>
               <GuessForm
                 wordList={wordList}
                 index={index}
                 correctList={correct}
                 handleChange={handleGuessChange}
+                // is disabled unless previous or next word is correct
+                isDisabled={!(correct[index] || correct[index + 2])}
               />
             </>
           )}
         </hstack>
       ))}
-      {wordList.at(-1) != undefined && <text>{wordList.at(-1)}</text>}
+      {wordList.at(-1) != undefined && <text size="xlarge">{wordList.at(-1)?.toUpperCase()}</text>}
     </vstack>
   );
 };

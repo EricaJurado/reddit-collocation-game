@@ -4,11 +4,12 @@ interface GuessFormProps {
   wordList: string[];
   index: number;
   correctList: boolean[];
+  isDisabled: boolean;
   handleChange: (newGuess: string, index: number) => void;
 }
 
 export const GuessForm = (props: GuessFormProps, context: Context): JSX.Element => {
-  const { wordList, index, correctList, handleChange } = props;
+  const { wordList, index, correctList, isDisabled, handleChange } = props;
 
   const form = useForm(
     {
@@ -48,7 +49,7 @@ export const GuessForm = (props: GuessFormProps, context: Context): JSX.Element 
       onPress={() => {
         context.ui.showForm(form);
       }}
-      disabled={correctList[index]}
+      disabled={isDisabled}
     >
       test
     </button>

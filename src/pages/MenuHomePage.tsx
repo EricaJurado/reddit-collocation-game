@@ -92,92 +92,79 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
   return (
     <vstack width="100%" height="100%" alignment="center middle">
       {/* Menu */}
-      <zstack width="100%" height="100%" alignment="center middle">
-        <vstack width="100%" height="100%" alignment="center middle">
-          <image
-            imageHeight={384}
-            imageWidth={800}
-            url="background-light.gif"
+
+      <vstack height="100%">
+        <image imageHeight={84} imageWidth={676} url="logo-transparent.gif" />
+        <vstack alignment="center middle" gap="small">
+          <hstack
+            alignment="center middle"
             width="100%"
-            height="100%"
-            imageWidth={`${context.dimensions!.width}px`}
-            imageHeight={`${context.dimensions!.height}px`}
-            resizeMode="cover"
-          />
+            height="50px"
+            padding="small"
+            gap="small"
+            onPress={() => props.pageSetter('daily')}
+          >
+            <image
+              imageHeight={58}
+              imageWidth={452}
+              url="TodaysPuzzle.gif"
+              description="Today's Puzzle"
+            />
+            {isDailySolved ? <text>✅</text> : <text>❌</text>}
+          </hstack>
         </vstack>
-        <vstack height="100%">
-          <image imageHeight={84} imageWidth={676} url="logo-transparent.gif" />
-          <vstack alignment="center middle" gap="small">
-            <hstack
-              alignment="center middle"
-              width="100%"
-              height="50px"
-              padding="small"
-              gap="small"
-              onPress={() => props.pageSetter('daily')}
-            >
-              <image
-                imageHeight={58}
-                imageWidth={452}
-                url="TodaysPuzzle.gif"
-                description="Today's Puzzle"
-              />
-              {isDailySolved ? <text>✅</text> : <text>❌</text>}
-            </hstack>
-          </vstack>
-          <vstack alignment="center middle" gap="small">
-            <hstack
-              alignment="center middle"
-              width="100%"
-              height="50px"
-              padding="small"
-              gap="small"
-              onPress={() => props.pageSetter('leaderboard')}
-            >
-              <image
-                imageHeight={50}
-                imageWidth={362}
-                url="Leaderboard.gif"
-                description="Leaderboard"
-              />
-            </hstack>
-          </vstack>
-          <vstack alignment="center middle" gap="small">
-            <hstack
-              alignment="center middle"
-              width="100%"
-              height="50px"
-              padding="small"
-              gap="small"
-              onPress={() => context.ui.showForm(createForm)} // Show the form on click
-            >
-              <image
-                imageHeight={50}
-                imageWidth={420}
-                url="CreatePuzzle.gif"
-                description="Create Puzzle"
-              />
-            </hstack>
-          </vstack>
-          <vstack alignment="center middle" gap="small">
-            <hstack
-              alignment="center middle"
-              width="100%"
-              height="50px"
-              padding="small"
-              gap="small"
-              onPress={() => props.pageSetter('howto')}
-            >
-              <image
-                imageHeight={52}
-                imageWidth={386}
-                url="HowToPlay.gif"
-                description="How To Play"
-              />
-            </hstack>
-          </vstack>
+        <vstack alignment="center middle" gap="small">
+          <hstack
+            alignment="center middle"
+            width="100%"
+            height="50px"
+            padding="small"
+            gap="small"
+            onPress={() => props.pageSetter('leaderboard')}
+          >
+            <image
+              imageHeight={50}
+              imageWidth={362}
+              url="Leaderboard.gif"
+              description="Leaderboard"
+            />
+          </hstack>
         </vstack>
-      </zstack>
+        <vstack alignment="center middle" gap="small">
+          <hstack
+            alignment="center middle"
+            width="100%"
+            height="50px"
+            padding="small"
+            gap="small"
+            onPress={() => context.ui.showForm(createForm)} // Show the form on click
+          >
+            <image
+              imageHeight={50}
+              imageWidth={420}
+              url="CreatePuzzle.gif"
+              description="Create Puzzle"
+            />
+          </hstack>
+        </vstack>
+        <vstack alignment="center middle" gap="small">
+          <hstack
+            alignment="center middle"
+            width="100%"
+            height="50px"
+            padding="small"
+            gap="small"
+            onPress={() => props.pageSetter('howto')}
+          >
+            <image
+              imageHeight={52}
+              imageWidth={386}
+              url="HowToPlay.gif"
+              description="How To Play"
+            />
+          </hstack>
+        </vstack>
+      </vstack>
     </vstack>
   );
 };

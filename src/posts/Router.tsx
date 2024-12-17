@@ -72,7 +72,17 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
   };
 
   return (
-    <zstack width="100%" height="100%" alignment="top start">
+    <zstack width="100%" height="100%" alignment="center middle">
+      <vstack width="100%" height="100%" alignment="center middle">
+        <image
+          url="background-light.gif"
+          width="100%"
+          height="100%"
+          imageWidth={`${context.dimensions!.width}px`}
+          imageHeight={`${context.dimensions!.height}px`}
+          resizeMode="cover"
+        />
+      </vstack>
       {postTypes[data.postType] || (
         <vstack alignment="center middle" grow>
           <text>Error: Unknown post type</text>
