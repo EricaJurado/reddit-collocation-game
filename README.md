@@ -18,5 +18,5 @@ Top the leaderboards for bragging rights
 ![Shows PhraseMe Leaderboard. Has leaderboards for Daily Streak, Total Daily, Community Solved, and Top Created.](./example-leaderboard.png)
 
 And get flair to show off your achievements.
-![Shows one of the custom user flairs.](./user-flair-example.png)
 ![Shows DM notifying user they got a new flair.](./flair-message-example.png)
+![Shows one of the custom user flairs.](./user-flair-example.png)
