@@ -27,17 +27,21 @@ Devvit.configure({
 Devvit.addSchedulerJob({
   name: 'daily_thread',
   onRun: async (_, context) => {
-    console.log('daily_thread handler called');
-    const subreddit = await context.reddit.getCurrentSubreddit();
+    const service = new Service(context);
+    const { reddit } = context;
+    const subreddit = await reddit.getCurrentSubreddit();
     const now = new Date();
     const formattedNow = formatCreatedAtDate(now);
-    const resp = await context.reddit.submitPost({
-      subredditName: subreddit.name,
+    const post = await reddit.submitPost({
       title: `Daily Puzzle ${formattedNow}`,
-      text: 'This is a daily thread, comment here!',
+      subredditName: subreddit.name,
+      preview: (
+        <vstack>
+          <text>Loading...</text>
+        </vstack>
+      ),
     });
-    const service = new Service(context);
-    await service.postService.saveDailyPost(resp.id, resp.createdAt);
+    await service.postService.saveDailyPost(post.id, post.createdAt);
   },
 });
 
@@ -46,7 +50,7 @@ Devvit.addTrigger({
   onEvent: async (_, context) => {
     try {
       const jobId = await context.scheduler.runJob({
-        cron: '0 12 * * *',
+        cron: '0 0 * * *',
         name: 'daily_thread',
         data: {},
       });
