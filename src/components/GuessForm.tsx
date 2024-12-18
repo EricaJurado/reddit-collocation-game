@@ -58,7 +58,7 @@ export const GuessForm = (props: GuessFormProps, context: Context): JSX.Element 
       }}
       disabled={currentFieldDisabled}
     >
-      {hints[index + 1].toUpperCase()}
+      {hints[index + 1].toUpperCase()}...?
     </button>
   );
 };

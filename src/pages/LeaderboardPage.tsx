@@ -65,57 +65,126 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
     </vstack>
   );
 
+  const [currLeaderPage, setCurrLeaderPage] = useState('dailyStreak');
+
   // UI render
   return (
-    <vstack padding="medium" gap="medium">
-      <text color="black" size="large" weight="bold">
-        Leaderboard Page
-      </text>
+    <vstack padding="medium" gap="medium" height="100%">
+      <hstack gap="medium" width="100%">
+        <hstack
+          backgroundColor="white"
+          padding="small"
+          cornerRadius="medium"
+          alignment="center middle"
+        >
+          <text color="black" onPress={() => setCurrLeaderPage('dailyStreak')}>
+            Daily Streak 🔥
+          </text>
+        </hstack>
 
-      {/* User Streak Info */}
-      <hstack alignment="center middle" gap="medium">
-        <text color="black">Current Streak: {streak}</text>
-        <spacer />
-        <text color="black">Total Daily Solved: {dailySolved}</text>
-        <spacer />
-        <text color="black">Last Solved: {lastSolved}</text>
+        <hstack
+          backgroundColor="white"
+          padding="small"
+          cornerRadius="medium"
+          alignment="center middle"
+        >
+          <text color="black" onPress={() => setCurrLeaderPage('dailyTotal')}>
+            Total Daily 📅
+          </text>
+        </hstack>
+
+        <hstack
+          backgroundColor="white"
+          padding="small"
+          cornerRadius="medium"
+          alignment="center middle"
+        >
+          <text color="black" onPress={() => setCurrLeaderPage('userGenSolved')}>
+            Community Solved🧠
+          </text>
+        </hstack>
+
+        <hstack
+          backgroundColor="white"
+          padding="small"
+          cornerRadius="medium"
+          alignment="center middle"
+        >
+          <text color="black" onPress={() => setCurrLeaderPage('userCreated')}>
+            Top Created 📝
+          </text>
+        </hstack>
       </hstack>
 
-      {/* Streak Leaderboard */}
-      <text color="black" size="medium" weight="bold">
-        Streak Leaderboard
-      </text>
-      <hstack alignment="top start" gap="large">
-        {createColumn(streakLeaderboard, 'username', 'User', 'middle center', 'top center')}
-        {createColumn(streakLeaderboard, 'score', 'Streak', 'middle center', 'top center')}
-      </hstack>
+      {currLeaderPage === 'dailyStreak' && (
+        <>
+          {/* Streak Leaderboard */}
+          <text color="black" size="medium" weight="bold">
+            Longest Daily Streak
+          </text>
+          <hstack alignment="top start" gap="large">
+            {createColumn(streakLeaderboard, 'username', 'User', 'middle center', 'top center')}
+            {createColumn(streakLeaderboard, 'score', 'Streak', 'middle center', 'top center')}
+          </hstack>
+        </>
+      )}
 
-      {/* Daily Leaderboard */}
-      <text color="black" size="medium" weight="bold">
-        Daily Leaderboard
-      </text>
-      <hstack alignment="top start" gap="large">
-        {createColumn(dailyLeaderboard, 'username', 'User', 'middle center', 'top center')}
-        {createColumn(dailyLeaderboard, 'score', 'Streak', 'top center', 'middle start')}
-      </hstack>
+      {currLeaderPage === 'dailyTotal' && (
+        <>
+          {/* Daily Leaderboard */}
+          <text color="black" size="medium" weight="bold">
+            Total Dailies Solved
+          </text>
+          <hstack alignment="top start" gap="large">
+            {createColumn(dailyLeaderboard, 'username', 'User', 'middle center', 'top center')}
+            {createColumn(dailyLeaderboard, 'score', 'Streak', 'top center', 'middle start')}
+          </hstack>
+        </>
+      )}
 
-      {/* User Generated Solved Puzzles */}
-      {/* <text size="medium" weight="bold">
-        User Generated Solved Puzzles
-      </text>
-      <hstack alignment="top start" gap="large">
-        {createColumn(userGenSolvedLeaderboard, 'username', 'User', 'middle center', 'top center')}
-        {createColumn(userGenSolvedLeaderboard, 'score', 'Solved', 'top center', 'middle start')}
-      </hstack> */}
+      {currLeaderPage === 'userGenSolved' && (
+        <>
+          {/* User Generated Solved Puzzles */}
+          <text size="medium" weight="bold">
+            Total Community Generated Puzzles Solved
+          </text>
+          <hstack alignment="top start" gap="large">
+            {createColumn(
+              userGenSolvedLeaderboard,
+              'username',
+              'User',
+              'middle center',
+              'top center'
+            )}
+            {createColumn(
+              userGenSolvedLeaderboard,
+              'score',
+              'Solved',
+              'top center',
+              'middle start'
+            )}
+          </hstack>
+        </>
+      )}
 
-      {/* User Created Puzzles */}
-      <text color="black" size="medium" weight="bold">
-        User Created Puzzles
-      </text>
-      <hstack alignment="top start" gap="large">
-        {createColumn(userCreatedLeaderboard, 'username', 'User', 'middle center', 'top center')}
-        {createColumn(userCreatedLeaderboard, 'score', 'Created', 'top center', 'middle start')}
-      </hstack>
+      {currLeaderPage === 'userCreated' && (
+        <>
+          {/* User Created Puzzles */}
+          <text color="black" size="medium" weight="bold">
+            Total Puzzles Created
+          </text>
+          <hstack alignment="top start" gap="large">
+            {createColumn(
+              userCreatedLeaderboard,
+              'username',
+              'User',
+              'middle center',
+              'top center'
+            )}
+            {createColumn(userCreatedLeaderboard, 'score', 'Created', 'top center', 'middle start')}
+          </hstack>
+        </>
+      )}
     </vstack>
   );
 };

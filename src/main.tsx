@@ -111,7 +111,7 @@ Devvit.addMenuItem({
 // Add a post type definition
 Devvit.addCustomPostType({
   name: 'Experience Post',
-  height: 'regular',
+  height: 'tall',
   render: Router,
 });
 
