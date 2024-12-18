@@ -44,7 +44,6 @@ export class Service {
     userUserGeneratedSolved: (username: string) => `user:${username}:solvedUGPuzzles`,
     userUserGeneratedSolvedCount: (username: string) => `user:${username}:solvedUGCount`,
     userDailySolvedList: (username: string) => `user:${username}:dailySolvedPuzzles`,
-    userDailySolvedCount: (username: string) => `user:${username}:dailySolvedCount`,
     userStreak: (username: string) => `user:${username}:streak`, // current daily streak
     userLongestStreak: (username: string) => `user:${username}:longestStreak`, // longest daily streak
     userLastDailySolved: (username: string) => `user:${username}:lastDailySolved`,

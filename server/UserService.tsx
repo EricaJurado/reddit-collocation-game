@@ -155,7 +155,6 @@ export class UserService extends ServiceBase {
     if (!solvedDays.includes(puzzleDay)) {
       solvedDays.push(puzzleDay);
       await this.redis.hSet(key, { list: JSON.stringify(solvedDays) });
-      await this.redis.hIncrBy(this.keys.userDailySolvedCount(username), puzzleDay, 1);
     }
   }
 

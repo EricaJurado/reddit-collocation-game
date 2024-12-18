@@ -145,7 +145,7 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
       {currLeaderPage === 'userGenSolved' && (
         <>
           {/* User Generated Solved Puzzles */}
-          <text size="medium" weight="bold">
+          <text color="black" size="medium" weight="bold">
             Total Community Generated Puzzles Solved
           </text>
           <hstack alignment="top start" gap="large">

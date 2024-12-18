@@ -78,13 +78,14 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     <zstack width="100%" height="100%" alignment="center middle">
       <vstack width="100%" height="100%" alignment="center middle">
         <image
-          url="background-light.gif"
-          width="100%"
+          imageHeight={1024}
+          imageWidth={1500}
           height="100%"
-          imageWidth={`${context.dimensions!.width}px`}
-          imageHeight={`${context.dimensions!.height}px`}
+          width="100%"
+          url="background-light.gif"
+          description="Striped blue background"
           resizeMode="cover"
-        />
+        />{' '}
       </vstack>
       {postTypes[data.postType] || (
         <vstack alignment="center middle" grow>

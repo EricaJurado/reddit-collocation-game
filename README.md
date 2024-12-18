@@ -1,4 +1,3 @@
-## Commands
+PhraseMe is a word-based puzzle game designed to challenge players to guess phrasemes—two words that frequently appear together in everyday language. These include common phrases like “hot water,” split-up compound words like “water-mark,” and famous names like “Mark Twain.” A “phraseme” is any fixed or semi-fixed expression in language, making it the perfect term for the collocated word pairs that players connect in this game. By solving these puzzles, players flex their linguistic intuition and have fun connecting the dots.
 
-- `devvit playtest collocationgame`: Starts a development server where you can develop your application live on Reddit.
-- `npm run upload`: Uploads a new version of your app
+Start from the bottom up or top down (or swap between the two) and figure out all the words!
