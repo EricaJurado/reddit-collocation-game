@@ -8,6 +8,7 @@ import { MenuHomePage } from '../pages/MenuHomePage.js';
 import { WinPage } from '../pages/WinPage.js';
 import { HowToPage } from '../pages/HowToPage.js';
 import { LeaderboardPage } from '../pages/LeaderboardPage.js';
+import { Preview } from '../components/Preview.js';
 
 interface DailyPostProps {
   postData: PostData;
@@ -60,7 +61,7 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
 
   const pages: Record<string, JSX.Element> = {
     daily: !wordList ? (
-      <text color="black">Loading...</text>
+      <Preview />
     ) : Array.isArray(wordList.data) ? (
       <zstack height="100%" width="100%">
         <vstack height="100%" width="100%" alignment="center middle">

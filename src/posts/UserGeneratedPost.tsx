@@ -8,6 +8,7 @@ import { LeaderboardPage } from '../pages/LeaderboardPage.js';
 import { formatCreatedAtDate } from '../utils.js';
 import { getPuzzleByDate } from '../../server/serverUtils.js';
 import { HowToPage } from '../pages/HowToPage.js';
+import { Preview } from '../components/Preview.js';
 
 interface UserGeneratedPostProps {
   postData: UserGenPostData;
@@ -81,7 +82,7 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
 
   const pages: Record<string, JSX.Element> = {
     puzzle: !puzzleData ? (
-      <text color="black">Loading...</text>
+      <Preview />
     ) : Array.isArray(puzzleData.puzzle) ? (
       <zstack height="100%" width="100%">
         <vstack height="100%" width="100%" alignment="center middle">

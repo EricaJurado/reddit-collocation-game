@@ -79,7 +79,28 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
         const post = await context.reddit.submitPost({
           title: postTitle,
           subredditName: community.name,
-          preview: <text color="black">Loading...</text>,
+          preview: (
+            <zstack width="100%" height="100%" alignment="center middle">
+              <image
+                imageHeight={1024}
+                imageWidth={1500}
+                height="100%"
+                width="100%"
+                url="background-light.gif"
+                description="Striped blue background"
+                resizeMode="cover"
+              />
+              <image
+                url="spinner.gif"
+                description="Loading ..."
+                imageHeight={1080}
+                imageWidth={1080}
+                width="128px"
+                height="128px"
+                resizeMode="scale-down"
+              />
+            </zstack>
+          ),
         });
         await service.puzzleService.saveUserPuzzle(props.username, wordList, post.id);
         // update user's created puzzles

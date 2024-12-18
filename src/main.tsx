@@ -4,6 +4,7 @@ import { Router } from './posts/Router.js';
 import { Service } from '../server/Service.js';
 import { formatCreatedAtDate } from './utils.js';
 import './jobs/userFlair.js';
+import { Preview } from './components/Preview.js';
 
 Devvit.addSettings([
   // Just here as an example
@@ -69,11 +70,7 @@ Devvit.addMenuItem({
     const post = await reddit.submitPost({
       title: "Let's play PhraseMe!",
       subredditName: subreddit.name,
-      preview: (
-        <vstack>
-          <text color="black">Loading...</text>
-        </vstack>
-      ),
+      preview: <Preview />,
     });
     ui.showToast({ text: 'Added Pinned Game Post' });
     await post.sticky();

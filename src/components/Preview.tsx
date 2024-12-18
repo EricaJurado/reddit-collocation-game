@@ -7,7 +7,7 @@ export const Preview = (): JSX.Element => (
       imageWidth={1500}
       height="100%"
       width="100%"
-      url="background.png"
+      url="background-light.gif"
       description="Striped blue background"
       resizeMode="cover"
     />
