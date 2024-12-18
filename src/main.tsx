@@ -19,7 +19,6 @@ Devvit.addSettings([
 
 Devvit.configure({
   redditAPI: true,
-  http: true,
   redis: true,
   realtime: true,
 });
