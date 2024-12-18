@@ -69,7 +69,7 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
 
   // UI render
   return (
-    <vstack padding="medium" gap="medium" height="100%">
+    <vstack padding="medium" gap="medium" height="100%" alignment="center middle">
       <hstack gap="medium" width="100%">
         <hstack
           backgroundColor="white"
@@ -137,7 +137,7 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
           </text>
           <hstack alignment="top start" gap="large">
             {createColumn(dailyLeaderboard, 'username', 'User', 'middle center', 'top center')}
-            {createColumn(dailyLeaderboard, 'score', 'Streak', 'top center', 'middle start')}
+            {createColumn(dailyLeaderboard, 'score', 'Streak', 'middle center', 'top center')}
           </hstack>
         </>
       )}
@@ -160,8 +160,8 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
               userGenSolvedLeaderboard,
               'score',
               'Solved',
-              'top center',
-              'middle start'
+              'middle center',
+              'top center'
             )}
           </hstack>
         </>
@@ -181,7 +181,13 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
               'middle center',
               'top center'
             )}
-            {createColumn(userCreatedLeaderboard, 'score', 'Created', 'top center', 'middle start')}
+            {createColumn(
+              userCreatedLeaderboard,
+              'score',
+              'Created',
+              'middle center',
+              'top center'
+            )}
           </hstack>
         </>
       )}
