@@ -4,17 +4,11 @@ PhraseMe is a word-based puzzle game designed to challenge players to guess phra
 
 Start from the bottom up or top down (or swap between the two) and figure out all the words!
 
-<video width="600" controls>
-  <source src="./example-game.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[Watch the demo](./example-game.mp4)
 
 Create your own puzzles for others to solve.
 
-<video width="600" controls>
-  <source src="./example-create.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[Watch the demo](./example-create.mp4)
 
 Top the leaderboards for bragging rights
 
