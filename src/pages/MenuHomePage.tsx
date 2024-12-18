@@ -96,13 +96,7 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
       {/* Menu */}
 
       <vstack height="100%" alignment="center middle" gap="small">
-        <image
-          imageHeight={84}
-          imageWidth={676}
-          width="400px"
-          maxWidth={100}
-          url="logo-transparent.gif"
-        />
+        <image imageHeight={84} imageWidth={676} width="400px" url="logo-transparent.gif" />
         <vstack alignment="center middle" gap="small">
           <hstack gap="small" alignment="center middle" onPress={() => props.pageSetter('daily')}>
             <text size="xlarge" color="black">
