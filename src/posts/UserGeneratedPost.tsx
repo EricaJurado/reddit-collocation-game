@@ -83,21 +83,21 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
 
   const pages: Record<string, JSX.Element> = {
     puzzle: !puzzleData ? (
-      <text>Loading...</text>
+      <text color="black">Loading...</text>
     ) : Array.isArray(puzzleData.puzzle) ? (
       <zstack height="100%" width="100%">
         <vstack height="100%" width="100%" alignment="center middle">
           <GuessPage wordList={puzzleData.puzzle} solvedSetter={savePuzzleSolved} />
         </vstack>
-        <vstack alignment="bottom start" width="100%" height="100%">
-          <text>{isPuzzleSolved ? 'Solved!' : ''}</text>
+        <vstack alignment="bottom start" width="100%" height="100%" padding="small">
+          <text color="black">{isPuzzleSolved ? 'Solved!' : ''}</text>
         </vstack>
-        <vstack alignment="bottom end" width="100%" height="100%">
-          <text>{puzzleData.creator}</text>
+        <vstack alignment="bottom end" width="100%" height="100%" padding="small">
+          <text color="black">Created by u/{puzzleData.creator}</text>
         </vstack>
       </zstack>
     ) : (
-      <text>Error: Could not load puzzle data.</text>
+      <text color="black">Error: Could not load puzzle data.</text>
     ),
     daily: (
       <zstack height="100%" width="100%">
@@ -105,7 +105,7 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
           <GuessPage wordList={todaysPuzzle || []} solvedSetter={saveDailySolved} />
         </vstack>
         <vstack alignment="bottom start" width="100%" height="100%">
-          <text>{isDailySolved ? 'Solved!' : ''}</text>
+          <text color="black">{isDailySolved ? 'Solved!' : ''}</text>
         </vstack>
       </zstack>
     ),
@@ -119,7 +119,7 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
     <vstack key={page} height="100%" width="100%">
       <zstack height="100%" width="100%">
         {page !== 'menu' && (
-          <hstack alignment="top end" width="100%">
+          <hstack alignment="top end" width="100%" padding="small">
             <button onPress={() => setPage('menu')}>Menu</button>
           </hstack>
         )}

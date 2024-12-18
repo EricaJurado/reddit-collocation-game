@@ -80,7 +80,7 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
         const post = await context.reddit.submitPost({
           title: postTitle,
           subredditName: community.name,
-          preview: <text>Loading...</text>,
+          preview: <text color="black">Loading...</text>,
         });
         await service.puzzleService.saveUserPuzzle(props.username, wordList, post.id);
         // update user's created puzzles
@@ -97,74 +97,43 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
       {/* Menu */}
 
       <vstack height="100%" alignment="center middle" gap="small">
-        <image imageHeight={84} imageWidth={676} url="logo-transparent.gif" />
+        <image
+          imageHeight={84}
+          imageWidth={676}
+          width="400px"
+          maxWidth={100}
+          url="logo-transparent.gif"
+        />
         <vstack alignment="center middle" gap="small">
-          <hstack
-            alignment="center middle"
-            width="100%"
-            height="50px"
-            padding="small"
-            gap="small"
-            onPress={() => props.pageSetter('daily')}
-          >
-            <image
-              imageHeight={58}
-              imageWidth={452}
-              url="TodaysPuzzle.gif"
-              description="Today's Puzzle"
-            />
+          <hstack gap="small" alignment="center middle" onPress={() => props.pageSetter('daily')}>
+            <text size="xlarge" color="black">
+              Today's Puzzle
+            </text>
             {isDailySolved ? <text>✅</text> : <text>❌</text>}
           </hstack>
         </vstack>
         <vstack alignment="center middle" gap="small">
-          <hstack
-            alignment="center middle"
-            width="100%"
-            height="50px"
-            padding="small"
-            gap="small"
-            onPress={() => props.pageSetter('leaderboard')}
-          >
-            <image
-              imageHeight={50}
-              imageWidth={362}
-              url="Leaderboard.gif"
-              description="Leaderboard"
-            />
+          <hstack alignment="center middle" onPress={() => props.pageSetter('leaderboard')}>
+            <text size="xlarge" color="black">
+              Leaderboard
+            </text>
           </hstack>
         </vstack>
         <vstack alignment="center middle" gap="small">
           <hstack
             alignment="center middle"
-            width="100%"
-            height="50px"
-            padding="small"
-            gap="small"
             onPress={() => context.ui.showForm(createForm)} // Show the form on click
           >
-            <image
-              imageHeight={50}
-              imageWidth={420}
-              url="CreatePuzzle.gif"
-              description="Create Puzzle"
-            />
+            <text size="xlarge" color="black">
+              Create Your Own Puzzle
+            </text>
           </hstack>
         </vstack>
         <vstack alignment="center middle" gap="small">
-          <hstack
-            alignment="center middle"
-            width="100%"
-            height="50px"
-            padding="small"
-            gap="small"
-            onPress={() => props.pageSetter('howto')}
-          >
-            <image
-              imageHeight={52}
-              imageWidth={386}
-              url="HowToPlay.gif"
-              description="How To Play"
-            />
+          <hstack alignment="center middle" onPress={() => props.pageSetter('howto')}>
+            <text size="xlarge" color="black">
+              How To Play
+            </text>
           </hstack>
         </vstack>
       </vstack>

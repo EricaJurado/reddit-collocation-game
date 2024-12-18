@@ -53,10 +53,12 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
   ) => (
     <vstack gap="small">
       <hstack alignment={colTitleAlignment || 'top center'} gap="small">
-        <text weight="bold">{title}</text>
+        <text color="black" weight="bold">
+          {title}
+        </text>
       </hstack>
       {data.map((entry, index) => (
-        <text alignment={colDataAlignment || 'middle center'} key={index.toString()}>
+        <text color="black" alignment={colDataAlignment || 'middle center'} key={index.toString()}>
           {entry[keyName]}
         </text>
       ))}
@@ -66,21 +68,21 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
   // UI render
   return (
     <vstack padding="medium" gap="medium">
-      <text size="large" weight="bold">
+      <text color="black" size="large" weight="bold">
         Leaderboard Page
       </text>
 
       {/* User Streak Info */}
       <hstack alignment="center middle" gap="medium">
-        <text>Current Streak: {streak}</text>
+        <text color="black">Current Streak: {streak}</text>
         <spacer />
-        <text>Total Daily Solved: {dailySolved}</text>
+        <text color="black">Total Daily Solved: {dailySolved}</text>
         <spacer />
-        <text>Last Solved: {lastSolved}</text>
+        <text color="black">Last Solved: {lastSolved}</text>
       </hstack>
 
       {/* Streak Leaderboard */}
-      <text size="medium" weight="bold">
+      <text color="black" size="medium" weight="bold">
         Streak Leaderboard
       </text>
       <hstack alignment="top start" gap="large">
@@ -89,7 +91,7 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
       </hstack>
 
       {/* Daily Leaderboard */}
-      <text size="medium" weight="bold">
+      <text color="black" size="medium" weight="bold">
         Daily Leaderboard
       </text>
       <hstack alignment="top start" gap="large">
@@ -107,7 +109,7 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
       </hstack> */}
 
       {/* User Created Puzzles */}
-      <text size="medium" weight="bold">
+      <text color="black" size="medium" weight="bold">
         User Created Puzzles
       </text>
       <hstack alignment="top start" gap="large">

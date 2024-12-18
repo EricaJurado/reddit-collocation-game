@@ -77,11 +77,17 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
 
   return (
     <vstack padding="medium" gap="medium" alignment="start middle">
-      {wordList[0] && <text size="xlarge">{wordList[0].toUpperCase()}</text>}
+      {wordList[0] && (
+        <text size="xlarge" color="black">
+          {wordList[0].toUpperCase()}
+        </text>
+      )}
       {wordList.slice(1, wordList.length - 1).map((word, index) => (
         <hstack key={`${index}`} gap="medium">
           {correct[index + 1] ? (
-            <text size="xlarge">{wordList[index + 1].toUpperCase()}</text>
+            <text size="xlarge" color="black">
+              {wordList[index + 1].toUpperCase()}
+            </text>
           ) : (
             <>
               <GuessForm
@@ -95,7 +101,11 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
           )}
         </hstack>
       ))}
-      {wordList.at(-1) != undefined && <text size="xlarge">{wordList.at(-1)?.toUpperCase()}</text>}
+      {wordList.at(-1) != undefined && (
+        <text size="xlarge" color="black">
+          {wordList.at(-1)?.toUpperCase()}
+        </text>
+      )}
     </vstack>
   );
 };

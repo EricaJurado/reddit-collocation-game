@@ -88,7 +88,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
       </vstack>
       {postTypes[data.postType] || (
         <vstack alignment="center middle" grow>
-          <text>Error: Unknown post type</text>
+          <text color="black">Error: Unknown post type</text>
         </vstack>
       )}
     </zstack>

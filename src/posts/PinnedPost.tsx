@@ -63,8 +63,8 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
         <vstack height="100%" width="100%" alignment="center middle">
           <GuessPage wordList={wordList.data || []} solvedSetter={saveDailySolved} />
         </vstack>
-        <vstack alignment="bottom start" width="100%" height="100%">
-          <text>{isDailySolved ? 'Solved!' : ''}</text>
+        <vstack alignment="bottom start" width="100%" height="100%" padding="small">
+          <text color="black">{isDailySolved ? 'Solved!' : ''}</text>
         </vstack>
       </zstack>
     ),
@@ -76,7 +76,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     <vstack key={page} height="100%" width="100%">
       <zstack height="100%" width="100%">
         {page !== 'menu' && (
-          <hstack alignment="top end" width="100%">
+          <hstack alignment="top end" width="100%" padding="small">
             <button onPress={() => setPage('menu')}>Menu</button>
           </hstack>
         )}

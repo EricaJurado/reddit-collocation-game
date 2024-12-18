@@ -71,7 +71,7 @@ Devvit.addMenuItem({
       subredditName: subreddit.name,
       preview: (
         <vstack>
-          <text>Loading...</text>
+          <text color="black">Loading...</text>
         </vstack>
       ),
     });
@@ -111,7 +111,7 @@ Devvit.addMenuItem({
 // Add a post type definition
 Devvit.addCustomPostType({
   name: 'Experience Post',
-  height: 'tall',
+  height: 'regular',
   render: Router,
 });
 

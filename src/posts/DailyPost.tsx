@@ -60,18 +60,18 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
 
   const pages: Record<string, JSX.Element> = {
     daily: !wordList ? (
-      <text>Loading...</text>
+      <text color="black">Loading...</text>
     ) : Array.isArray(wordList.data) ? (
       <zstack height="100%" width="100%">
         <vstack height="100%" width="100%" alignment="center middle">
           <GuessPage wordList={wordList.data || []} solvedSetter={saveDailySolved} />
         </vstack>
-        <vstack alignment="bottom start" width="100%" height="100%">
-          <text>{isDailySolved ? 'Solved!' : ''}</text>
+        <vstack alignment="bottom start" width="100%" height="100%" padding="small">
+          <text color="black">{isDailySolved ? 'Solved!' : ''}</text>
         </vstack>
       </zstack>
     ) : (
-      <text>Error: Could not load puzzle data.</text>
+      <text color="black">Error: Could not load puzzle data.</text>
     ),
     leaderboard: <LeaderboardPage username={props.username} />,
     win: <WinPage onNext={() => setPage('menu')} />,
@@ -83,7 +83,7 @@ export const DailyPost = (props: DailyPostProps, context: Context): JSX.Element 
     <vstack key={page} height="100%" width="100%">
       <zstack height="100%" width="100%">
         {page !== 'menu' && (
-          <hstack alignment="top end" width="100%">
+          <hstack alignment="top end" width="100%" padding="small">
             <button onPress={() => setPage('menu')}>Menu</button>
           </hstack>
         )}
