@@ -63,9 +63,7 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
   const [isPuzzleSolved] = useState(async () => {
     if (props.username) {
       const puzzleList = await service.userService.getUserGeneratedSolvedPuzzleList(props.username);
-      console.log('puzzleList', puzzleList);
       const shortName = props.postData.postId.slice(3);
-      console.log('shortName', shortName);
       return puzzleList.includes(props.postData.postId) || puzzleList.includes(shortName);
     }
     return false;
@@ -92,9 +90,11 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
         <vstack alignment="bottom start" width="100%" height="100%" padding="small">
           <text color="black">{isPuzzleSolved ? 'Solved!' : ''}</text>
         </vstack>
-        <vstack alignment="bottom end" width="100%" height="100%" padding="small">
-          <text color="black">Created by u/{puzzleData.creator}</text>
-        </vstack>
+        {puzzleData.creator && (
+          <vstack alignment="bottom end" width="100%" height="100%" padding="small">
+            <text color="black">Created by u/{puzzleData.creator}</text>
+          </vstack>
+        )}
       </zstack>
     ) : (
       <text color="black">Error: Could not load puzzle data.</text>
@@ -119,9 +119,14 @@ export const UserGeneratedPost = (props: UserGeneratedPostProps, context: Contex
     <vstack key={page} height="100%" width="100%">
       <zstack height="100%" width="100%">
         {page !== 'menu' && (
-          <hstack alignment="top end" width="100%" padding="small">
-            <button onPress={() => setPage('menu')}>Menu</button>
-          </hstack>
+          <>
+            <hstack alignment="top end" width="100%" padding="small">
+              <button onPress={() => setPage('menu')}>Menu</button>
+            </hstack>
+            <hstack alignment="top end" width="100%" padding="small">
+              <button onPress={() => setPage('menu')}>Menu</button>
+            </hstack>
+          </>
         )}
         <hstack alignment="middle center" height="100%" width="100%">
           {pages[page]}

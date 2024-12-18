@@ -51,14 +51,35 @@ export const GuessForm = (props: GuessFormProps, context: Context): JSX.Element 
   );
 
   return (
-    <button
-      width="200px"
-      onPress={() => {
-        context.ui.showForm(form);
-      }}
-      disabled={currentFieldDisabled}
-    >
-      {hints[index + 1].toUpperCase()}...?
-    </button>
+    <hstack onPress={() => context.ui.showForm(form)} gap="small">
+      {hints[index + 1].split('').map((letter, i) => (
+        <hstack
+          backgroundColor={currentFieldDisabled ? 'lightgray' : 'white'}
+          borderColor={currentFieldDisabled ? 'gray' : 'black'}
+          width="30px"
+          height="30px"
+          alignment="center middle"
+          cornerRadius="small"
+        >
+          <text key={`${i}`} color="black" size="xlarge">
+            {letter.toLocaleUpperCase()}
+          </text>
+        </hstack>
+      ))}
+      {Array.from(Array(10 - hints[index + 1].length).keys()).map((i) => (
+        <hstack
+          backgroundColor={currentFieldDisabled ? 'lightgray' : 'white'}
+          borderColor={currentFieldDisabled ? 'gray' : 'black'}
+          width="30px"
+          height="30px"
+          alignment="center middle"
+          cornerRadius="small"
+        >
+          <text key={`${i}`} color="black" size="xlarge">
+            {' '}
+          </text>
+        </hstack>
+      ))}
+    </hstack>
   );
 };

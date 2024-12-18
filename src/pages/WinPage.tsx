@@ -33,10 +33,8 @@ export const WinPage = (props: WinPageProps, context: Context): JSX.Element => {
   return (
     <vstack padding="medium" gap="medium">
       <text color="black" size="xlarge">
-        🏆You Win!🏆{' '}
+        {randomPhrase}
       </text>
-      <text color="green">{randomPhrase}</text>
-      <button onPress={props.onNext}>Menu</button>
     </vstack>
   );
 };

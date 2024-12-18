@@ -55,7 +55,6 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
     const currCorrect = checkWord(newGuess, index + 1);
 
     if (!currCorrect) {
-      context.ui.showToast('Incorrect guess');
       // give user another letter in the word they got wrong
       const newHints = [...hints];
       const currHintLength = newHints[index + 1].length;
@@ -70,24 +69,77 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
         newHints[index + 2] = wordList[index + 2][0];
       }
       setHints(newHints);
-
-      context.ui.showToast('Correct guess');
     }
   };
 
   return (
     <vstack padding="medium" gap="medium" alignment="start middle">
       {wordList[0] && (
-        <text size="xlarge" color="black">
-          {wordList[0].toUpperCase()}
-        </text>
+        // for each letter show box
+        <hstack gap="small">
+          {wordList[0].split('').map((letter, index) => (
+            <hstack
+              backgroundColor="white"
+              borderColor="black"
+              width="30px"
+              height="30px"
+              alignment="center middle"
+              cornerRadius="small"
+            >
+              <text size="xlarge" color="black">
+                {letter.toUpperCase()}
+              </text>
+            </hstack>
+          ))}
+          {Array.from(Array(10 - wordList[0].length).keys()).map((i) => (
+            <hstack
+              backgroundColor="white"
+              borderColor="black"
+              width="30px"
+              height="30px"
+              alignment="center middle"
+              cornerRadius="small"
+            >
+              <text size="xlarge" color="black">
+                {' '}
+              </text>
+            </hstack>
+          ))}
+        </hstack>
       )}
       {wordList.slice(1, wordList.length - 1).map((word, index) => (
         <hstack key={`${index}`} gap="medium">
           {correct[index + 1] ? (
-            <text size="xlarge" color="black">
-              {wordList[index + 1].toUpperCase()}
-            </text>
+            <hstack gap="small">
+              {word.split('').map((letter, i) => (
+                <hstack
+                  backgroundColor="white"
+                  borderColor="black"
+                  width="30px"
+                  height="30px"
+                  alignment="center middle"
+                  cornerRadius="small"
+                >
+                  <text size="xlarge" color="black">
+                    {letter.toUpperCase()}
+                  </text>
+                </hstack>
+              ))}
+              {Array.from(Array(10 - word.length).keys()).map((i) => (
+                <hstack
+                  backgroundColor="white"
+                  borderColor="black"
+                  width="30px"
+                  height="30px"
+                  alignment="center middle"
+                  cornerRadius="small"
+                >
+                  <text size="xlarge" color="black">
+                    {' '}
+                  </text>
+                </hstack>
+              ))}
+            </hstack>
           ) : (
             <>
               <GuessForm
@@ -102,9 +154,41 @@ export const GuessPage = (props: GuessPageProps, context: Context): JSX.Element 
         </hstack>
       ))}
       {wordList.at(-1) != undefined && (
-        <text size="xlarge" color="black">
-          {wordList.at(-1)?.toUpperCase()}
-        </text>
+        <hstack gap="small">
+          {wordList
+            .at(-1)!
+            .split('')
+            .map((letter, index) => (
+              <hstack
+                key={index.toString()}
+                backgroundColor="white"
+                borderColor="black"
+                width="30px"
+                height="30px"
+                alignment="center middle"
+                cornerRadius="small"
+              >
+                <text size="xlarge" color="black">
+                  {letter.toUpperCase()}
+                </text>
+              </hstack>
+            ))}
+          {Array.from(Array(10 - wordList.at(-1)!.length).keys()).map((i) => (
+            <hstack
+              key={`empty-${i}`}
+              backgroundColor="white"
+              borderColor="black"
+              width="30px"
+              height="30px"
+              alignment="center middle"
+              cornerRadius="small"
+            >
+              <text size="xlarge" color="black">
+                {' '}
+              </text>
+            </hstack>
+          ))}
+        </hstack>
       )}
     </vstack>
   );

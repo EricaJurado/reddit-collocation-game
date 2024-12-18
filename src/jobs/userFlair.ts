@@ -81,17 +81,13 @@ export const userStreakUpFlair = Devvit.addSchedulerJob({
     },
     context
   ) => {
-    console.log('USER_STREAK_UP handler called');
     if (event.data) {
       try {
-        console.log(event.data);
         const service = new Service(context);
 
         const targetFlair = getFlairByStreak(event.data.streak);
-        console.log(targetFlair);
 
         const currentFlair = await service.getUserFlairData(event.data.username);
-        console.log(currentFlair);
 
         // If the user already has a higher or same flair (or can't find target flair), don't do anything
         if (!targetFlair || currentFlair === targetFlair.rank || currentFlair > targetFlair.rank) {

@@ -75,7 +75,7 @@ Devvit.addMenuItem({
         </vstack>
       ),
     });
-    ui.showToast({ text: 'Created post!' });
+    ui.showToast({ text: 'Added Pinned Game Post' });
     await post.sticky();
     await service.postService.savePinnedPost(post.id, post.createdAt);
     ui.navigateTo(post.url);

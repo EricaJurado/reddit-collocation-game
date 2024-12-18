@@ -75,7 +75,6 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
       const postTitle =
         values.title || `${values.word1.toUpperCase()} → ${values.word5.toUpperCase()}`;
       if (props.username) {
-        context.ui.showToast('Puzzle created!');
         const community = await context.reddit.getCurrentSubreddit();
         const post = await context.reddit.submitPost({
           title: postTitle,
@@ -86,7 +85,7 @@ export const MenuHomePage = (props: MenuProps, context: Context): JSX.Element =>
         // update user's created puzzles
         await service.userService.addUserCreatedPuzzle(props.username, post.id);
         await service.leaderboardService.updateUserCreatedPuzzleLeaderboard(props.username);
-        context.ui.showToast('Created Post');
+        context.ui.showToast('Puzzle created!');
         context.ui.navigateTo(post);
       }
     }

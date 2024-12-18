@@ -101,9 +101,10 @@ export class PostService extends ServiceBase {
     const puzzleEntry = JSON.parse(puzzleEntryRaw);
 
     // Ensure all required fields are present
-    const { data, postType, createdAt, creator } = puzzleEntry;
+    const { data, postType, createdAt, creator, puzzle } = puzzleEntry;
     return {
-      puzzle: JSON.parse(data), // Parse the stored puzzle data
+      puzzle: (puzzle && Array.isArray(JSON.parse(puzzle))) ? JSON.parse(puzzle) : [],
+      // puzzle: JSON.parse(data), // Parse the stored puzzle data
       postId, // Post ID already matches the `PostId` type
       postType: postType ?? 'usergenerated',
       createdAt: createdAt ?? new Date().toISOString(),
